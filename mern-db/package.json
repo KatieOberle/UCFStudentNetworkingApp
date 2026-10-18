@@ -1,0 +1,20 @@
+{
+  "name": "mern-db-setup",
+  "version": "1.0.0",
+  "description": "MongoDB database creation, indexes and test data for the COP 4331 MERN project (modeled on MERN A)",
+  "main": "scripts/seed.js",
+  "scripts": {
+    "seed": "node scripts/seed.js",
+    "reset": "node scripts/seed.js --reset",
+    "verify": "node scripts/verify.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "mongodb": "^6.8.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.0.0"
+  }
+}
