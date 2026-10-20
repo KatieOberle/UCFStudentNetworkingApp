@@ -1,15 +1,21 @@
 interface LoginPageProps {
   onSignupClick: () => void;
+  onLoginClick: () => void;
 }
 
-function LoginPage({ onSignupClick }: LoginPageProps) {
+function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
   return (
     <div className="login-page">
       <div className="login-card">
         <h1>KnightLink</h1>
         <h2>UCF Student Networking</h2>
 
-        <form>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            onLoginClick();
+          }}
+        >
           <label>
             UCF Email
             <input type="email" placeholder="name@ucf.edu" />
@@ -39,4 +45,5 @@ function LoginPage({ onSignupClick }: LoginPageProps) {
 }
 
 export default LoginPage;
+
 

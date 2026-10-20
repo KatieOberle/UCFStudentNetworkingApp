@@ -93,3 +93,115 @@ body {
   color: var(--muted);
 }
 
+.home-page {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 32px;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.top-nav h1 {
+  margin: 0;
+}
+
+.top-nav nav {
+  display: flex;
+  gap: 12px;
+}
+
+.top-nav button {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.top-nav button:hover {
+  color: var(--green);
+}
+
+.home-content {
+  width: min(1100px, 90%);
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.welcome-section {
+  margin-bottom: 32px;
+}
+
+.welcome-section h2 {
+  margin-bottom: 10px;
+}
+
+.welcome-section p {
+  color: var(--muted);
+}
+
+.discussion-section {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.section-header button {
+  background-color: var(--green);
+  color: #111;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.empty-state {
+  margin-top: 24px;
+  padding: 32px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+}
+
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background-color: #0f0b14;
+  color: var(--text);
+}
+
+.search-bar button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--green);
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
