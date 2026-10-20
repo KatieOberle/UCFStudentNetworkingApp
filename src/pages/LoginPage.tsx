@@ -1,4 +1,8 @@
-function LoginPage() {
+interface LoginPageProps {
+  onSignupClick: () => void;
+}
+
+function LoginPage({ onSignupClick }: LoginPageProps) {
   return (
     <div className="login-page">
       <div className="login-card">
@@ -19,10 +23,20 @@ function LoginPage() {
           <button type="submit">Log In</button>
         </form>
 
-        <p>Don't have an account? Sign up</p>
+        <p>
+          Don't have an account?{" "}
+          <button
+            type="button"
+            className="link-button"
+            onClick={onSignupClick}
+          >
+            Sign up
+          </button>
+        </p>
       </div>
     </div>
   );
 }
 
 export default LoginPage;
+
