@@ -2,6 +2,7 @@ import { useState } from "react";
 import SearchPage from "./pages/SearchPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import ProfilePage from "./pages/ProfilePage";
 import HomePage from "./pages/HomePage";
 
 function App() {
@@ -27,6 +28,16 @@ if (page === "search") {
       onHomeClick={() => setPage("home")}
       onCommunitiesClick={() => setPage("communities")}
       onProfileClick={() => setPage("profile")}
+    />
+  );
+}
+
+if (page === "profile") {
+  return (
+    <ProfilePage
+      onHomeClick={() => setPage("home")}
+      onSearchClick={() => setPage("search")}
+      onCommunitiesClick={() => setPage("communities")}
     />
   );
 }
