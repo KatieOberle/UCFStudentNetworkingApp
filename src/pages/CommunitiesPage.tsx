@@ -1,11 +1,13 @@
 interface CommunitiesPageProps {
   onHomeClick: () => void;
+  onDiscussionsClick: () => void;
   onSearchClick: () => void;
   onProfileClick: () => void;
 }
 
 function CommunitiesPage({
   onHomeClick,
+  onDiscussionsClick,
   onSearchClick,
   onProfileClick,
 }: CommunitiesPageProps) {
@@ -17,6 +19,10 @@ function CommunitiesPage({
         <nav>
           <button type="button" onClick={onHomeClick}>
             Home
+          </button>
+
+          <button type="button" onClick={onDiscussionsClick}>
+           Discussions
           </button>
 
           <button type="button" onClick={onSearchClick}>

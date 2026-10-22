@@ -1,10 +1,12 @@
 interface HomePageProps {
+  onDiscussionsClick: () => void;
   onSearchClick: () => void;
   onCommunitiesClick: () => void;
   onProfileClick: () => void;
 }
 
 function HomePage({
+  onDiscussionsClick,
   onSearchClick,
   onCommunitiesClick,
   onProfileClick,
@@ -15,6 +17,9 @@ function HomePage({
         <h1>KnightLink</h1>
 
         <nav>
+          <button type="button" onClick={onDiscussionsClick}>
+            Discussions
+          </button>
           <button type="button">Home</button>
           <button type="button" onClick={onSearchClick}>
             Search

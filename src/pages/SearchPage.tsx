@@ -1,11 +1,13 @@
 interface SearchPageProps {
   onHomeClick: () => void;
+  onDiscussionsClick: () => void;
   onCommunitiesClick: () => void;
   onProfileClick: () => void;
 }
 
 function SearchPage({
   onHomeClick,
+  onDiscussionsClick,
   onCommunitiesClick,
   onProfileClick,
 }: SearchPageProps) {
