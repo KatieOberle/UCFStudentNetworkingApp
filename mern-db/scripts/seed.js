@@ -1,5 +1,5 @@
 // Creates the UCFNetworking database: collections, validation, indexes and test data.
-// Usage:  npm run seed   (safe to re-run)   |   npm run reset   (drop everything, reseed)
+// Usage:  npm run seed   (safe to re-run)   |   npm run reset -- --force   (drop everything, reseed)
 //
 // SOURCES (details and licenses in ATTRIBUTION.md). Patterns below were adapted and re-implemented
 // for the plain MongoDB driver; the sources themselves use Mongoose. Tags like [Zell] mark where.
@@ -61,18 +61,22 @@ const prepare = {
 
 // Required fields / allowed values per collection (MongoDB $jsonSchema). [Medium] required + unique idea.
 const emailPattern = '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$';
+const int = { bsonType: 'int' };
 const VALIDATORS = {
   Users: { bsonType: 'object',
     required: ['UserID', 'FirstName', 'LastName', 'Login', 'Email', 'Password', 'EmailVerified'],
-    properties: { Email: { bsonType: 'string', pattern: emailPattern },
-                  Password: { bsonType: 'string', minLength: 6 },
+    properties: { UserID: int,
+                  Email: { bsonType: 'string', pattern: emailPattern },
+                  Password: { bsonType: 'string', minLength: 60, maxLength: 60 },
                   EmailVerified: { bsonType: 'bool' } } },
-  Posts: { bsonType: 'object', required: ['PostID', 'AuthorId', 'Title', 'Body'] },
-  Replies: { bsonType: 'object', required: ['ReplyID', 'PostID', 'AuthorId', 'Body'] },
+  Posts: { bsonType: 'object', required: ['PostID', 'AuthorId', 'Title', 'Body'],
+    properties: { PostID: int, AuthorId: int } },
+  Replies: { bsonType: 'object', required: ['ReplyID', 'PostID', 'AuthorId', 'Body'],
+    properties: { ReplyID: int, PostID: int, AuthorId: int } },
   Connections: { bsonType: 'object', required: ['RequesterId', 'RecipientId', 'Status'],
-    properties: { Status: { enum: ['pending', 'accepted'] } } },
+    properties: { RequesterId: int, RecipientId: int, Status: { enum: ['pending', 'accepted'] } } },
   Reports: { bsonType: 'object', required: ['ReportID', 'ReporterId', 'ReportedUserId', 'Reason', 'Status'],
-    properties: { Status: { enum: ['open', 'reviewed'] } } }
+    properties: { ReportID: int, ReporterId: int, ReportedUserId: int, Status: { enum: ['open', 'reviewed'] } } }
 };
 
 async function createIndexes(db) {
@@ -96,6 +100,11 @@ async function createIndexes(db) {
 async function seed(uri = process.env.MONGODB_URI, dbName = process.env.DB_NAME || 'UCFNetworking', opts = {}) {
   if (!uri) throw new Error('MONGODB_URI is not set (copy .env.example to .env).');
   const reset = opts.reset ?? process.argv.includes('--reset');
+  const force = opts.force ?? process.argv.includes('--force');
+  const isLocal = /^mongodb:\/\/(localhost|127\.0\.0\.1)[:/]/.test(uri);
+  if (reset && !isLocal && !force) {
+    throw new Error('Refusing to drop a non-local database. This would wipe everyone\'s data. Re-run with --force if you really mean it: npm run reset -- --force');
+  }
   const client = new MongoClient(uri);
   try {                                                         // [Medium] try / catch / finally
     await client.connect();

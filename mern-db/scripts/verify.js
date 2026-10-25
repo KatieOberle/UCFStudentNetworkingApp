@@ -54,10 +54,12 @@ async function verify(uri = process.env.MONGODB_URI, dbName = process.env.DB_NAM
   // Moderation + unique constraints
   const open = await db.collection('Reports').countDocuments({ Status: 'open' });
   check('2 open reports', open === 2, open);
-  const base = { UserID: 99, FirstName: 'T', LastName: 'T', Login: 'tmp99', Email: 'tmp99@ucf.edu', Password: 'abcdefg', EmailVerified: false };
+  const base = { UserID: 99, FirstName: 'T', LastName: 'T', Login: 'tmp99', Email: 'tmp99@ucf.edu', Password: '$2a$10$' + 'x'.repeat(53), EmailVerified: false };
   const tryInsert = async d => { try { await db.collection('Users').insertOne({ ...d }); await db.collection('Users').deleteOne({ UserID: 99 }); return false; } catch (e) { return e.code; } };
   check('Duplicate Login rejected (unique index, code 11000)', await tryInsert({ ...base, Login: 'josiah' }) === 11000);
   check('Invalid email rejected by schema validation', await tryInsert({ ...base, Email: 'not-an-email' }) === 121);
+  check('Plaintext (unhashed) password rejected', await tryInsert({ ...base, Password: 'Test1234!' }) === 121);
+  check('String ID rejected (must be a number)', await tryInsert({ ...base, UserID: '99' }) === 121);
   check('Missing required field rejected', await tryInsert({ UserID: 99, Login: 'tmp99' }) === 121);
   check('Invalid connection Status rejected', await (async () => { try { await db.collection('Connections').insertOne({ RequesterId: 5, RecipientId: 9, Status: 'bogus' }); return false; } catch (e) { return e.code === 121; } })());
   check('Unverified token has expiry', unv?.VerifyExpires instanceof Date, unv?.VerifyExpires?.toISOString?.());
