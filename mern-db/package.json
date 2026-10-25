@@ -6,7 +6,8 @@
   "scripts": {
     "seed": "node scripts/seed.js",
     "reset": "node scripts/seed.js --reset",
-    "verify": "node scripts/verify.js"
+    "verify": "node scripts/verify.js",
+    "test": "node scripts/selftest.js"
   },
   "license": "ISC",
   "dependencies": {
@@ -16,5 +17,8 @@
   },
   "devDependencies": {
     "mongodb-memory-server": "^10.0.0"
+  },
+  "engines": {
+    "node": ">=22.23.4"
   }
 }
