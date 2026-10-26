@@ -17,10 +17,12 @@ function HomePage({
         <h1>KnightLink</h1>
 
         <nav>
+          <button type = "button" >
+           Home
+          </button>
           <button type="button" onClick={onDiscussionsClick}>
             Discussions
           </button>
-          <button type="button">Home</button>
           <button type="button" onClick={onSearchClick}>
             Search
           </button>

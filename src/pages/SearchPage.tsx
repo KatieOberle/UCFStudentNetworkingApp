@@ -21,6 +21,10 @@ function SearchPage({
             Home
           </button>
 
+          <button type="button" onClick={onDiscussionsClick}>
+            Discussions
+          </button>
+
           <button type="button">
             Search
           </button>
