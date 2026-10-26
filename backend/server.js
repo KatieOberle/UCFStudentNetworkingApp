@@ -15,7 +15,7 @@ const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
 client.connect();
 
-var api = require('./api.js');
+var api = require('./controllers/authController.js');
 api.setApp(app, client);
 
 app.use((req, res, next) =>
