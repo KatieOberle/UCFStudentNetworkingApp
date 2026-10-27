@@ -132,7 +132,7 @@ exports.register = async function (req, res, next)
 				const result = await db.collection('Users').insertOne(newUser);
 
 				// AI assisted code
-				const verificationLink =`http://localhost:5000/api/verify?token=${verifyToken}`;
+				const verificationLink =`http://localhost:5000/api/auth/verify?token=${verifyToken}`;
 				console.log('Verification link:', verificationLink);
 			}
 			else
