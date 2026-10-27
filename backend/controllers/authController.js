@@ -7,7 +7,11 @@ let db;
 
 exports.setDatabase = function (client)
 {
-	db = client.db('COP4331Cards');
+	if (!process.env.DB_NAME) {
+   		throw new Error('DB_NAME is not set in the environment');
+	}
+
+	db = client.db(process.env.DB_NAME);
 };
 
 exports.login = async function (req,res)
