@@ -15,8 +15,11 @@ const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
 client.connect();
 
-var api = require('./controllers/authController.js');
-api.setApp(app, client);
+const authController = require('./controllers/authController');
+const authRoutes = require('./routes/authRoutes');
+
+authController.setDatabase(client);
+app.use('/api/auth', authRoutes);
 
 app.use((req, res, next) =>
 	{
