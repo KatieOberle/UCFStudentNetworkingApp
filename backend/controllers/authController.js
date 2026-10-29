@@ -78,12 +78,14 @@ exports.login = async function (req,res)
 	res.status(200).json(ret);
 };
 
-/*
-app.post('/api/logout', async (req, res, next)
+// Katie: implement logout endpoint
+exports.logout = async function (req, res)
 {
-	// Logout api endpoint
-});
-*/
+    // remove the JWT on frontend to logout
+    return res.status(200).json({
+        message: "Logout successful" // confirmation that token removed and logout complete
+    });
+};
 
 exports.register = async function (req, res, next)
 {
