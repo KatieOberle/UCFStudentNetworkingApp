@@ -17,7 +17,7 @@ function HomePage({
         <h1>KnightLink</h1>
 
         <nav>
-          <button type = "button" >
+          <button type = "button" className="active-nav" aria-current="page" >
            Home
           </button>
           <button type="button" onClick={onDiscussionsClick}>

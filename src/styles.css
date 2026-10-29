@@ -129,6 +129,11 @@ body {
   color: var(--green);
 }
 
+.top-nav .active-nav {
+  color: var(--green);
+  border-bottom: 2px solid var(--green);
+}
+
 .home-content {
   width: min(1100px, 90%);
   margin: 0 auto;
