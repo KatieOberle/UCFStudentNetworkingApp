@@ -1,9 +1,14 @@
+import { useState } from "react";
+
 interface LoginPageProps {
   onSignupClick: () => void;
   onLoginClick: () => void;
 }
 
 function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   return (
     <div className="login-page">
       <div className="login-card">
@@ -13,17 +18,34 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            onLoginClick();
+
+            console.log("Email:", email);
+            console.log("Password provided:", password.length > 0);
+
+            // TODO: Call backend login endpoint here.
+            // onLoginClick() should run only after successful login.
           }}
         >
           <label>
             UCF Email
-            <input type="email" placeholder="name@ucf.edu" />
+            <input
+              type="email"
+              placeholder="name@ucf.edu"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
           </label>
 
           <label>
             Password
-            <input type="password" placeholder="Enter password" />
+            <input
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
           </label>
 
           <button type="submit">Log In</button>
