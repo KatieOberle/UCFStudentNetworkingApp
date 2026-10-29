@@ -50,14 +50,22 @@ function DiscussionsPage({
         </section>
 
         <section className="discussion-section">
-          <div className="search-bar">
-            <input
-              type="search"
-              placeholder="Search discussions..."
-            />
+<form
+  className="search-bar"
+  onSubmit={(event) => {
+    event.preventDefault();
+  }}
+>
+  <input
+    type="search"
+    placeholder="Search discussions..."
+    aria-label="Search discussions"
+  />
 
-            <button type="button">Search</button>
-          </div>
+  <button type="submit">
+    Search
+  </button>
+</form>  
 
           <div className="empty-state">
             <p>No discussions to display yet.</p>

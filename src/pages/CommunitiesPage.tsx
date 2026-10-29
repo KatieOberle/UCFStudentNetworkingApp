@@ -52,14 +52,22 @@ function CommunitiesPage({
         </section>
 
         <section className="discussion-section">
-          <div className="search-bar">
-            <input
-              type="search"
-              placeholder="Search communities..."
-            />
+<form
+  className="search-bar"
+  onSubmit={(event) => {
+    event.preventDefault();
+  }}
+>
+  <input
+    type="search"
+    placeholder="Search communities..."
+    aria-label="Search communities"
+  />
 
-            <button type="button">Search</button>
-          </div>
+  <button type="submit">
+    Search
+  </button>
+</form>
 
           <div className="empty-state">
             <p>Search for communities to see results.</p>

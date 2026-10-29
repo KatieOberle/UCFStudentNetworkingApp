@@ -25,7 +25,11 @@ function SearchPage({
             Discussions
           </button>
 
-          <button type="button" className="active-nav" aria-current="page" >
+          <button
+            type="button"
+            className="active-nav"
+            aria-current="page"
+          >
             Search
           </button>
 
@@ -42,6 +46,7 @@ function SearchPage({
       <main className="home-content">
         <section className="welcome-section">
           <h2>Search Students</h2>
+
           <p>
             Find students by name, major, career interests, or company
             affiliations.
@@ -49,16 +54,22 @@ function SearchPage({
         </section>
 
         <section className="discussion-section">
-          <div className="search-bar">
+          <form
+            className="search-bar"
+            onSubmit={(event) => {
+              event.preventDefault();
+            }}
+          >
             <input
               type="search"
               placeholder="Search students..."
+              aria-label="Search students"
             />
 
-            <button type="button">
+            <button type="submit">
               Search
             </button>
-          </div>
+          </form>
 
           <div className="empty-state">
             <p>Search for students to see results.</p>
@@ -70,3 +81,4 @@ function SearchPage({
 }
 
 export default SearchPage;
+
