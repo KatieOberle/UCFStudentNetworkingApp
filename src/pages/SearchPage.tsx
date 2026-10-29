@@ -25,7 +25,7 @@ function SearchPage({
             Discussions
           </button>
 
-          <button type="button">
+          <button type="button" className="active-nav" aria-current="page" >
             Search
           </button>
 

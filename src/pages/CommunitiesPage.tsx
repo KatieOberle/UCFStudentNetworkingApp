@@ -29,7 +29,7 @@ function CommunitiesPage({
             Search
           </button>
 
-          <button type="button">
+          <button type="button" className="active-nav" aria-current="page">
             Communities
           </button>
 

@@ -21,7 +21,7 @@ function DiscussionsPage({
             Home
           </button>
 
-          <button type="button">Discussions</button>
+          <button type="button" className="active-nav" aria-current="page">Discussions </button>
 
           <button type="button" onClick={onSearchClick}>
             Search

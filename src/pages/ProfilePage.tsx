@@ -33,7 +33,7 @@ function ProfilePage({
             Communities
           </button>
 
-          <button type="button">
+          <button type="button" className="active-nav" aria-current="page">
             Profile
           </button>
         </nav>
