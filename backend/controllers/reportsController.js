@@ -181,3 +181,71 @@ exports.createReport = async function (req, res) // user creates report function
         });
     }
 };
+
+// implement reports retrieval endpoint
+exports.getMyReports = async function (req, res)
+{
+    try
+    {
+        // verify JWT
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith('Bearer '))
+        {
+            return res.status(401).json({
+                error: 'Token required' // token error message
+            });
+        }
+
+        let decoded;
+
+        try
+        {
+            decoded = jwt.verify(
+                authHeader.split(' ')[1],
+                process.env.ACCESS_TOKEN_SECRET // use .env token
+            );
+        }
+        catch (error)
+        {
+            return res.status(401).json({
+                error: 'Invalid or expired token'
+            });
+        }
+
+        const reporterId = Number(decoded.userId);
+
+        if (!Number.isSafeInteger(reporterId) || reporterId <= 0) // invalid id check
+        {
+            return res.status(401).json({
+                error: 'Invalid user identity in token'
+            });
+        }
+
+        // retrieve reports submitted by user
+        const reports = await db.collection('Reports')
+            .find(
+                {reporterId: reporterId},
+                {
+                    projection: {
+                        reporterId: 0
+                    }
+                }
+            )
+            .sort({createdAt: -1})
+            .toArray();
+
+        return res.status(200).json({
+            count: reports.length,
+            reports: reports
+        });
+    }
+    catch (error)
+    {
+        console.error('Get my reports error:', error);
+
+        return res.status(500).json({
+            error: 'Server error while retrieving reports'
+        });
+    }
+};
