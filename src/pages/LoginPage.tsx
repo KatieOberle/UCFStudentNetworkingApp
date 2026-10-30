@@ -23,17 +23,7 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
         <h1>KnightLink</h1>
         <h2>UCF Student Networking</h2>
 
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-
-            console.log("Email:", email);
-            console.log("Password provided:", password.length > 0);
-
-            // TODO: Call backend login endpoint here.
-            // onLoginClick() should run only after successful login.
-          }}
-        >
+        <form onSubmit={handleLogin}>
           <label>
             UCF Email
             <input
