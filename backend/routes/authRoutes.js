@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
 	login,
-	//logout,
+	logout,
 	register,
 	verifyEmail,
 	me,
@@ -12,7 +12,7 @@ const {
 } = require('../controllers/authController');
 
 router.post('/login', login);
-//router.post('/logout', logout);
+router.post('/logout', logout);
 router.post('/register', register);
 router.get('/verify', verifyEmail);
 router.get('/me', me);
