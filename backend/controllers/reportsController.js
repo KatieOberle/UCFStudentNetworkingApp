@@ -249,3 +249,106 @@ exports.getMyReports = async function (req, res)
         });
     }
 };
+
+// note: admin role needs to be established for this endpoint to work
+// retrieve user reports on admin end
+exports.getReportsForUser = async function (req, res)
+{
+    try
+    {
+        // verify JWT
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith('Bearer '))
+        {
+            return res.status(401).json({
+                error: 'Token required' // invalid token
+            });
+        }
+
+        let decoded;
+
+        try
+        {
+            decoded = jwt.verify(
+                authHeader.split(' ')[1],
+                process.env.ACCESS_TOKEN_SECRET // access env for access token
+            );
+        }
+        catch (error)
+        {
+            return res.status(401).json({
+                error: 'Invalid or expired token'
+            });
+        }
+
+        const adminId = Number(decoded.userId); // needs to be implemented with admin backend
+        const targetId = Number(req.params.userId); // user ID for reports
+
+        if (
+            !Number.isSafeInteger(adminId) || adminId <= 0 ) // safe-checking admin ID
+        {
+            return res.status(401).json({
+                error: 'Invalid user identity in token'
+            });
+        }
+
+        if ( !/^[1-9]\d*$/.test(req.params.userId) || !Number.isSafeInteger(targetId)) // safecheck user id
+        {
+            return res.status(400).json({
+                error: 'Invalid user ID'
+            });
+        }
+
+        // confirm requester is admin
+        const users = db.collection('Users');
+
+        const admin = await users.findOne({ UserID: adminId });
+
+        if (!admin) // not admin trying to access private reports info
+        {
+            return res.status(401).json({error: 'Authenticated user not found'});
+        }
+
+        if (admin.Role !== 'admin')
+        {
+            return res.status(403).json({error: 'Administrator access required'});
+        }
+
+        // confirm target user exists
+        const reportedUser = await users.findOne({
+            UserID: targetId
+        });
+
+        if (!reportedUser)
+        {
+            return res.status(404).json({error: 'User not found'});
+        }
+
+        // retrieve reports against target user
+        const reports = await db.collection('Reports')
+            .find(
+                {reportedUserId: targetId},
+                {
+                    projection: { reporterId: 0 } // find report IDs
+                }
+            )
+            .sort({createdAt: -1}) // report id sorting
+            .toArray();
+
+        return res.status(200).json({
+            reportedUserId: targetId,
+            count: reports.length, // count used to determine account denial
+            reports: reports
+        });
+    }
+    catch (error)
+    {
+        console.error('Get reports for user error:', error);
+
+        return res.status(500).json({
+            error: 'Server error while retrieving reports'
+        });
+    }
+};
+
