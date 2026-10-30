@@ -13,8 +13,27 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // TODO: Send login information to backend
-    console.log("Login submitted:", email);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed.");
+      }
+
+      onLoginClick();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Login failed.");
+    }
   };
 
   return (
