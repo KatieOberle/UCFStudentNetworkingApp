@@ -148,27 +148,49 @@ exports.searchProfile = async function (req, res)
 		// Verify JWT via middleware (do this in routes
 		// Validate search term
 		const searchTerm = req.query.q?.trim();
+		const graduationYear = req.query.graduationYear;
 
-		if(!searchTerm || searchTerm.length > 100)
+		if(searchTerm && searchTerm.length > 100)
 		{
 			return res.status(400).json({error: 'Search term is required (maximum 100 characters)'});
 		}
 
-		const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+		if(graduationYear !== undefined)
+		{
+			if(!/^\d{4}$/.test(graduationYear))
+			{
+				return res.status(400).json({error: 'Graduation year must be a valid four-digit year'});
+			}
+		}
 
-		const regex = new RegExp(escapedTerm, 'i');
+		if(!searchTerm && graduationYear === undefined)
+		{
+			return res.status(400).json({error: 'At least one search parameter is required'});
+		}
+
+		const filters = {UserID: {$ne: req.user.userId}};
+
+		if(searchTerm)
+		{
+			const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+			const regex = new RegExp(escapedTerm, 'i');
+
+			filters.$or = [
+				{FirstName: regex},
+				{LastName: regex},
+				{Major: regex},
+				{Companies: regex},
+				{CareerInterests: regex}
+			];
+		}
+
+		if(graduationYear !== undefined)
+		{
+			filters.GraduationYear = Number(graduationYear);
+		}
 
 		const users = await db.collection('Users').find(
-			{
-				UserID: {$ne: req.user.userId},
-				$or: [
-					{FirstName:regex},
-					{LastName:regex},
-					{Major:regex},
-					{Companies:regex},
-					{CareerInterests:regex}
-				]
-			},
+			filters,
 			{
 				projection:
 				{
