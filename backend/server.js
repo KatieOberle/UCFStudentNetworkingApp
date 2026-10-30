@@ -18,8 +18,14 @@ client.connect();
 const authController = require('./controllers/authController');
 const authRoutes = require('./routes/authRoutes');
 
+const profileController = require('./controllers/profileController');
+const profileRoutes = require('./routes/profileRoutes');
+
 authController.setDatabase(client);
+profileController.setDatabase(client);
+
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.use((req, res, next) =>
 	{
