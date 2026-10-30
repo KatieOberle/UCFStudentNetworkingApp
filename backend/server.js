@@ -18,8 +18,16 @@ client.connect();
 const authController = require('./controllers/authController');
 const authRoutes = require('./routes/authRoutes');
 
+// update routes for reporting
+const reportsController = require('./controllers/reportsController');
+const reportsRoutes = require('./routes/reportsRoutes');
+
 authController.setDatabase(client);
 app.use('/api/auth', authRoutes);
+
+// update initializing database routes for reports
+reportsController.setDatabase(client);
+app.use('/api/reports', reportsRoutes);
 
 app.use((req, res, next) =>
 	{
