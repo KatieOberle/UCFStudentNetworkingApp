@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 
 interface LoginPageProps {
   onSignupClick: () => void;
@@ -8,6 +9,13 @@ interface LoginPageProps {
 function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // TODO: Send login information to backend
+    console.log("Login submitted:", email);
+  };
 
   return (
     <div className="login-page">
@@ -67,5 +75,3 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
 }
 
 export default LoginPage;
-
-
