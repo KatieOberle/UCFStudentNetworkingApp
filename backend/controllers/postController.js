@@ -2,7 +2,7 @@ let db;
 
 exports.setDatabase = function(client)
 {
-	db = client.db(process.env.DB_NAME;
+	db = client.db(process.env.DB_NAME);
 }
 
 exports.createPost = async function(req, res)
@@ -11,7 +11,7 @@ exports.createPost = async function(req, res)
 	{
 		const {title, body, tags} = req.body;
 
-		if(!Title || !Body)
+		if(!title || !body)
 		{
 			return res.status(400).json({error: 'Cannot make an empty post'});
 		}
@@ -50,7 +50,7 @@ exports.getUserPosts = async function (req, res)
 	{
 		const userId = Number(req.params.userId);
 
-		if(!Numer.isInteger(userId) || userId < 1)
+		if(!Number.isInteger(userId) || userId < 1)
 		{
 			return res.status(400).json({error: 'Invalid user ID'});
 		}
@@ -83,7 +83,7 @@ exports.getUserPosts = async function (req, res)
 	}
 };
 
-epxorts.updatePost = async function (req, res)
+exports.updatePost = async function (req, res)
 {
 	try
 	{
@@ -105,7 +105,7 @@ epxorts.updatePost = async function (req, res)
 				return res.status(400).json({error: 'Title cannot be empty'});
 			}
 
-			updates.title = title.trim();
+			updates.Title = title.trim();
 		}
 		if(body !== undefined)
 		{
@@ -114,7 +114,7 @@ epxorts.updatePost = async function (req, res)
 				return res.status(400).json({error: 'Body cannot be empty'});
 			}
 
-			updates.body = body.trim()
+			updates.Body = body.trim()
 		}
 		if(tags !== undefined)
 		{
@@ -129,7 +129,7 @@ epxorts.updatePost = async function (req, res)
 				return res.status(400).json({error: 'Tags must be non-empty strings'});
 			}
 
-			updates.tags = tags.map(tag => tag.trim());
+			updates.Tags = tags.map(tag => tag.trim());
 		}
 
 		if(Object.keys(updates).length === 0)
@@ -179,7 +179,7 @@ epxorts.updatePost = async function (req, res)
 			}
 		);
 
-		return res.status(200).json({message: 'Post edited successfully', post: updatedPost});
+		return res.status(200).json({message: 'Post edited successfully', post: updatePost});
 	}
 	catch(error)
 	{
