@@ -25,6 +25,11 @@ exports.login = async function (req,res)
 	// Request body follows this key/value format
 	const {email, password} = req.body;
 
+	if(!email || !password)
+	{
+		return res.status(400).json({error: 'Email and password are required'});
+	}
+
 	const lowerEmail = email.toLowerCase();
 
 	const user = await db.collection('Users').findOne({Email: lowerEmail});
@@ -94,8 +99,13 @@ exports.register = async function (req, res, next)
 	// Placeholder error variable
 	var error = '';
 
+	if(!email || !password)
+	{
+		return res.status(400).json({error: 'Email and password are required'});
+	}
+
 	// Request body follows this key/value format
-	const {login, password, email, firstName, lastName} = req.body;
+	const {password, email, firstName, lastName} = req.body;
 
 	const lowerEmail = email.toLowerCase();
 
@@ -127,7 +137,6 @@ exports.register = async function (req, res, next)
 
 				const newUser = {
 					UserID: userId,
-					Login: login,
 					Password: hashedPassword,
 					Email: lowerEmail,
 					FirstName: firstName,
@@ -261,9 +270,11 @@ exports.forgotPassword = async function (req, res)
 			return res.status(400).json({error: 'Email is required'});
 		}
 
+		const lowerEmail = email.toLowerCase();
+
 		const users = db.collection('Users');
 
-		const user = await users.findOne({Email: email});
+		const user = await users.findOne({Email: lowerEmail});
 
 		const message = 'If the user exists, a password reset link has been sent to their email.';
 
