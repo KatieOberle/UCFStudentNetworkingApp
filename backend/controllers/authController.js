@@ -23,12 +23,11 @@ exports.login = async function (req,res)
 	var error = '';
 
 	// Request body follows this key/value format
-	const {login, password} = req.body;
+	const {email, password} = req.body;
 
-	// Query the user collection for a matching login and password, and put it in an array
-	//const results = await db.collection('Users').find({Login:login,Password:password}).toArray();
+	const lowerEmail = email.toLowerCase();
 
-	const user = await db.collection('Users').findOne({Login: login});
+	const user = await db.collection('Users').findOne({Email: lowerEmail});
 
 	const passwordMatches = user ? await bcrypt.compare(password, user.Password) : false;
 	
@@ -98,6 +97,8 @@ exports.register = async function (req, res, next)
 	// Request body follows this key/value format
 	const {login, password, email, firstName, lastName} = req.body;
 
+	const lowerEmail = email.toLowerCase();
+
 	// AI assisted code
 	const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -109,7 +110,7 @@ exports.register = async function (req, res, next)
 
 	try
 	{
-		const dup = await db.collection('Users').find({Email:email}).toArray();
+		const dup = await db.collection('Users').find({Email:lowerEmail}).toArray();
 
 		if(dup.length > 0)
 		{
@@ -117,7 +118,7 @@ exports.register = async function (req, res, next)
 		}
 		else
 		{
-			const server = email.split('@').pop();
+			const server = lowerEmail.split('@').pop();
 
 			if(server === "ucf.edu")
 			{
@@ -128,7 +129,7 @@ exports.register = async function (req, res, next)
 					UserID: userId,
 					Login: login,
 					Password: hashedPassword,
-					Email: email,
+					Email: lowerEmail,
 					FirstName: firstName,
 					LastName: lastName,
 					EmailVerified: false,
