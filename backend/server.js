@@ -21,17 +21,22 @@ const authRoutes = require('./routes/authRoutes');
 const profileController = require('./controllers/profileController');
 const profileRoutes = require('./routes/profileRoutes');
 
+const postController = require('./controllers/postController');
+const postRoutes = require('./routes/postRoutes');
+
 authController.setDatabase(client);
 profileController.setDatabase(client);
+postController.setDatabase(client);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/post', postRoutes);
 
 app.use((req, res, next) =>
 	{
 		res.setHeader('Access-Control-Allow-Origin', '*');
 		res.setHeader(
-			'Access-Controll-Allow-Headers',
+			'Access-Control-Allow-Headers',
 			'Origin, X-Requested-With, Content-Type, Accept, Authorization'
 		);
 		res.setHeader(
