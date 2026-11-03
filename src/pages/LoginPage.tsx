@@ -31,6 +31,14 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
       }
 
       onLoginClick();
+
+
+      const data = await response.json();
+    if (!response.ok || data.error || !data.accessToken) {
+      throw new Error(data.error || "Login failed.");
+    }
+
+    onLoginClick();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Login failed.");
     }
