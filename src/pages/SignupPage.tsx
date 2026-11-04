@@ -3,9 +3,10 @@ import { useState, type FormEvent } from "react";
 
 interface SignupPageProps {
   onLoginClick: () => void;
+  registrationError?: string;
 }
 
-function SignupPage({ onLoginClick }: SignupPageProps) {
+function SignupPage({ onLoginClick, registrationError, }: SignupPageProps) {
   const [error, setError] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -99,11 +100,11 @@ function SignupPage({ onLoginClick }: SignupPageProps) {
             />
           </label>
 
-          {error && (
-            <p role="alert" className="form-error">
-              {error}
-            </p>
-          )}
+          {(error || registrationError) && (
+  <p role="alert" className="form-error">
+    {error || registrationError}
+  </p>
+)}
 
           <button type="submit">Register</button>
         </form>

@@ -6,6 +6,11 @@ import ProfilePage from "./pages/ProfilePage";
 import CommunitiesPage from "./pages/CommunitiesPage";
 import DiscussionsPage from "./pages/DiscussionsPage";
 import HomePage from "./pages/HomePage";
+import CheckEmailPage from "./pages/CheckEmailPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+
+
 
 function App() {
   const [page, setPage] = useState("login");
@@ -13,6 +18,29 @@ function App() {
   if (page === "signup") {
     return <SignupPage onLoginClick={() => setPage("login")} />;
   }
+ if (page === "check-email") {
+  return (
+    <CheckEmailPage
+      onLoginClick={() => setPage("login")}
+    />
+  );
+}
+
+if (page === "forgot-password") {
+  return (
+    <ForgotPasswordPage
+      onLoginClick={() => setPage("login")}
+    />
+  );
+}
+
+if (page === "reset-password") {
+  return (
+    <ResetPasswordPage
+      onLoginClick={() => setPage("login")}
+    />
+  );
+}
 
   if (page === "home") {
     return (
@@ -73,6 +101,7 @@ return (
   <LoginPage
     onSignupClick={() => setPage("signup")}
     onLoginClick={() => setPage("home")}
+    onForgotPasswordClick={() => setPage("forgot-password")}
   />
 );
 

@@ -1,9 +1,16 @@
+
 interface LoginPageProps {
   onSignupClick: () => void;
   onLoginClick: () => void;
+  onForgotPasswordClick: () => void;
+  loginError?: string;
 }
 
-function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
+function LoginPage({
+  onSignupClick,
+  onForgotPasswordClick,
+  loginError,
+}: LoginPageProps) {
   return (
     <div className="login-page">
       <div className="login-card">
@@ -13,21 +20,49 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            onLoginClick();
+
+            // TODO: Connect to the login API.
+            // Navigate to Home only after authentication succeeds.
           }}
         >
           <label>
             UCF Email
-            <input type="email" placeholder="name@ucf.edu" />
+            <input
+              type="email"
+              name="email"
+              placeholder="name@ucf.edu"
+              autoComplete="email"
+              required
+            />
           </label>
 
           <label>
             Password
-            <input type="password" placeholder="Enter password" />
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter password"
+              autoComplete="current-password"
+              required
+            />
           </label>
+
+          {loginError && (
+            <p role="alert" className="form-error">
+              {loginError}
+            </p>
+          )}
 
           <button type="submit">Log In</button>
         </form>
+
+        <button
+          type="button"
+          className="link-button"
+          onClick={onForgotPasswordClick}
+        >
+          Forgot password?
+        </button>
 
         <p>
           Don't have an account?{" "}
@@ -36,7 +71,7 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
             className="link-button"
             onClick={onSignupClick}
           >
-            Sign up
+            Register
           </button>
         </p>
       </div>
@@ -45,5 +80,3 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
 }
 
 export default LoginPage;
-
-
