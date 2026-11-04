@@ -64,7 +64,7 @@ const emailPattern = '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$';
 const int = { bsonType: 'int' };
 const VALIDATORS = {
   Users: { bsonType: 'object',
-    required: ['UserID', 'FirstName', 'LastName', 'Login', 'Email', 'Password', 'EmailVerified'],
+    required: ['UserID', 'FirstName', 'LastName', 'Email', 'Password', 'EmailVerified'],
     properties: { UserID: int,
                   Email: { bsonType: 'string', pattern: emailPattern },
                   Password: { bsonType: 'string', minLength: 60, maxLength: 60 },
@@ -82,7 +82,8 @@ const VALIDATORS = {
 async function createIndexes(db) {
   const U = db.collection('Users');
   await U.createIndex({ UserID: 1 }, { unique: true });
-  await U.createIndex({ Login: 1 }, { unique: true });
+  // Login is no longer required or unique (sign-in is by email). Mongo keeps old indexes, so drop it on existing DBs.
+  await U.dropIndex('Login_1').catch(e => { if (e.codeName !== 'IndexNotFound' && e.codeName !== 'NamespaceNotFound') throw e; });
   await U.createIndex({ Email: 1 }, { unique: true });          // [Medium] unique email
   await U.createIndex({ FirstName: 1, LastName: 1 });
   await U.createIndex({ Major: 1 });

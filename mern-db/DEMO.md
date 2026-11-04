@@ -20,7 +20,7 @@
 
 | Collection | Key fields | Indexes |
 |---|---|---|
-| **Users** | UserID, FirstName, LastName, Login, Email, Password (bcrypt), EmailVerified, VerifyToken, ResetToken, ResetExpires, Major, GraduationYear, CareerInterests[], Companies[], Bio, Contact{Email, LinkedIn}, CreatedAt | unique UserID/Login/Email; name; Major |
+| **Users** | UserID, FirstName, LastName, Login (optional, legacy), Email, Password (bcrypt), EmailVerified, VerifyToken, ResetToken, ResetExpires, Major, GraduationYear, CareerInterests[], Companies[], Bio, Contact{Email, LinkedIn}, CreatedAt | unique UserID/Email; name; Major |
 | **Posts** | PostID, AuthorId, Title, Body, Tags[], CreatedAt | unique PostID; AuthorId; CreatedAt desc |
 | **Replies** | ReplyID, PostID, AuthorId, Body, CreatedAt | unique ReplyID; (PostID, CreatedAt) |
 | **Connections** | RequesterId, RecipientId, Status (pending/accepted), CreatedAt | unique (RequesterId, RecipientId); (RecipientId, Status) |
