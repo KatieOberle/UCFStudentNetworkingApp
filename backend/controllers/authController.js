@@ -99,13 +99,14 @@ exports.register = async function (req, res, next)
 	// Placeholder error variable
 	var error = '';
 
+	// Request body follows this key/value format
+	const {password, email, firstName, lastName} = req.body;
+
 	if(!email || !password)
 	{
 		return res.status(400).json({error: 'Email and password are required'});
 	}
 
-	// Request body follows this key/value format
-	const {password, email, firstName, lastName} = req.body;
 
 	const lowerEmail = email.toLowerCase();
 
