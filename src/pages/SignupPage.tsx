@@ -1,41 +1,111 @@
+
+import { useState, type FormEvent } from "react";
+
 interface SignupPageProps {
   onLoginClick: () => void;
 }
 
 function SignupPage({ onLoginClick }: SignupPageProps) {
+  const [error, setError] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+
+    const form = new FormData(event.currentTarget);
+
+    const email = String(form.get("email") ?? "").trim();
+    const password = String(form.get("password") ?? "");
+    const confirmPassword = String(form.get("confirmPassword") ?? "");
+
+    if (!/^[^\s@]+@ucf\.edu$/i.test(email)) {
+      setError("You must register using a valid @ucf.edu email.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    // API registration will be connected by the functionality developer.
+    setError("Registration is not connected to the server yet.");
+  }
+
   return (
     <div className="login-page">
       <div className="login-card">
         <h1>Create Account</h1>
         <h2>Join KnightLink</h2>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <label>
             First Name
-            <input type="text" placeholder="Enter first name" />
+            <input
+              name="firstName"
+              type="text"
+              autoComplete="given-name"
+              required
+            />
           </label>
 
           <label>
             Last Name
-            <input type="text" placeholder="Enter last name" />
+            <input
+              name="lastName"
+              type="text"
+              autoComplete="family-name"
+              required
+            />
           </label>
 
           <label>
             UCF Email
-            <input type="email" placeholder="name@ucf.edu" />
+            <input
+              name="email"
+              type="email"
+              placeholder="name@ucf.edu"
+              autoComplete="email"
+              required
+            />
           </label>
+          <small>Only @ucf.edu email addresses are allowed.</small>
 
           <label>
             Password
-            <input type="password" placeholder="Create password" />
+            <input
+              name="password"
+              type="password"
+              minLength={8}
+              autoComplete="new-password"
+              required
+            />
           </label>
+          <small>Minimum 8 characters.</small>
 
           <label>
             Confirm Password
-            <input type="password" placeholder="Confirm password" />
+            <input
+              name="confirmPassword"
+              type="password"
+              minLength={8}
+              autoComplete="new-password"
+              required
+            />
           </label>
 
-          <button type="submit">Sign Up</button>
+          {error && (
+            <p role="alert" className="form-error">
+              {error}
+            </p>
+          )}
+
+          <button type="submit">Register</button>
         </form>
 
         <p>
@@ -54,5 +124,4 @@ function SignupPage({ onLoginClick }: SignupPageProps) {
 }
 
 export default SignupPage;
-
 

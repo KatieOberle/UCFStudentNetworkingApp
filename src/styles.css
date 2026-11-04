@@ -291,3 +291,25 @@ body {
     align-items: flex-start;
   }
 }
+.form-error {
+  color: #ffb4b4 !important;
+  background-color: #431a27;
+  border: 1px solid #e57373;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0;
+  text-align: left !important;
+}
+
+.login-card small {
+  color: #ded3e8;
+  line-height: 1.5;
+}
+
+.login-card .link-button {
+  background: transparent;
+  border: none;
+  color: var(--green);
+  padding: 4px;
+  text-decoration: underline;
+}
