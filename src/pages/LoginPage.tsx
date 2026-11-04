@@ -1,29 +1,76 @@
+import { useState } from "react";
+import type { FormEvent } from "react";
+
 interface LoginPageProps {
   onSignupClick: () => void;
   onLoginClick: () => void;
 }
 
 function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed.");
+      }
+
+      onLoginClick();
+
+
+      const data = await response.json();
+    if (!response.ok || data.error || !data.accessToken) {
+      throw new Error(data.error || "Login failed.");
+    }
+
+    onLoginClick();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Login failed.");
+    }
+  };
+
   return (
     <div className="login-page">
       <div className="login-card">
         <h1>KnightLink</h1>
         <h2>UCF Student Networking</h2>
 
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            onLoginClick();
-          }}
-        >
+        <form onSubmit={handleLogin}>
           <label>
             UCF Email
-            <input type="email" placeholder="name@ucf.edu" />
+            <input
+              type="email"
+              placeholder="name@ucf.edu"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
           </label>
 
           <label>
             Password
-            <input type="password" placeholder="Enter password" />
+            <input
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
           </label>
 
           <button type="submit">Log In</button>
@@ -45,5 +92,3 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
 }
 
 export default LoginPage;
-
-
