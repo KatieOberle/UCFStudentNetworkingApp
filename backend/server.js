@@ -24,13 +24,18 @@ const profileRoutes = require('./routes/profileRoutes');
 const postController = require('./controllers/postController');
 const postRoutes = require('./routes/postRoutes');
 
+const connectionController = require('./controllers/connectionController');
+const connectionRoutes = require('./routes/connectionRoutes');
+
 authController.setDatabase(client);
 profileController.setDatabase(client);
 postController.setDatabase(client);
+connectionController.setDatabase(client);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/post', postRoutes);
+app.use('/api/connection', connectionRoutes);
 
 app.use((req, res, next) =>
 	{
