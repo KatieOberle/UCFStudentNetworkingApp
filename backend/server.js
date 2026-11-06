@@ -18,6 +18,9 @@ client.connect();
 const authController = require('./controllers/authController');
 const authRoutes = require('./routes/authRoutes');
 
+// update routes for reporting
+const reportsController = require('./controllers/reportsController');
+const reportsRoutes = require('./routes/reportsRoutes');
 const profileController = require('./controllers/profileController');
 const profileRoutes = require('./routes/profileRoutes');
 
@@ -42,6 +45,10 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/post', postRoutes);
 app.use('/api/replies', commentRoutes);
 app.use('/api/connection', connectionRoutes);
+
+// update initializing database routes for reports
+reportsController.setDatabase(client);
+app.use('/api/reports', reportsRoutes);
 
 app.use((req, res, next) =>
 	{
