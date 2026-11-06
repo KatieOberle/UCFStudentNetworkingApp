@@ -56,7 +56,8 @@ async function verify(uri = process.env.MONGODB_URI, dbName = process.env.DB_NAM
   check('2 open reports', open === 2, open);
   const base = { UserID: 99, FirstName: 'T', LastName: 'T', Login: 'tmp99', Email: 'tmp99@ucf.edu', Password: '$2a$10$' + 'x'.repeat(53), EmailVerified: false };
   const tryInsert = async d => { try { await db.collection('Users').insertOne({ ...d }); await db.collection('Users').deleteOne({ UserID: 99 }); return false; } catch (e) { return e.code; } };
-  check('Duplicate Login rejected (unique index, code 11000)', await tryInsert({ ...base, Login: 'josiah' }) === 11000);
+  check('Duplicate Email rejected (unique index, code 11000)', await tryInsert({ ...base, Email: u.Email }) === 11000);
+  check('Signup without Login accepted (Login no longer required)', await tryInsert({ UserID: 99, FirstName: 'T', LastName: 'T', Email: 'tmp99@ucf.edu', Password: base.Password, EmailVerified: false }) === false);
   check('Invalid email rejected by schema validation', await tryInsert({ ...base, Email: 'not-an-email' }) === 121);
   check('Plaintext (unhashed) password rejected', await tryInsert({ ...base, Password: 'Test1234!' }) === 121);
   check('String ID rejected (must be a number)', await tryInsert({ ...base, UserID: '99' }) === 121);

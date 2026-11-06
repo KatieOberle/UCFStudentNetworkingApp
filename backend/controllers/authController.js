@@ -23,12 +23,16 @@ exports.login = async function (req,res)
 	var error = '';
 
 	// Request body follows this key/value format
-	const {login, password} = req.body;
+	const {email, password} = req.body;
 
-	// Query the user collection for a matching login and password, and put it in an array
-	//const results = await db.collection('Users').find({Login:login,Password:password}).toArray();
+	if(!email || !password)
+	{
+		return res.status(400).json({error: 'Email and password are required'});
+	}
 
-	const user = await db.collection('Users').findOne({Login: login});
+	const lowerEmail = email.toLowerCase();
+
+	const user = await db.collection('Users').findOne({Email: lowerEmail});
 
 	const passwordMatches = user ? await bcrypt.compare(password, user.Password) : false;
 	
@@ -96,7 +100,15 @@ exports.register = async function (req, res, next)
 	var error = '';
 
 	// Request body follows this key/value format
-	const {login, password, email, firstName, lastName} = req.body;
+	const {password, email, firstName, lastName} = req.body;
+
+	if(!email || !password)
+	{
+		return res.status(400).json({error: 'Email and password are required'});
+	}
+
+
+	const lowerEmail = email.toLowerCase();
 
 	// AI assisted code
 	const hashedPassword = await bcrypt.hash(password, 10);
@@ -109,7 +121,7 @@ exports.register = async function (req, res, next)
 
 	try
 	{
-		const dup = await db.collection('Users').find({Email:email}).toArray();
+		const dup = await db.collection('Users').find({Email:lowerEmail}).toArray();
 
 		if(dup.length > 0)
 		{
@@ -117,7 +129,7 @@ exports.register = async function (req, res, next)
 		}
 		else
 		{
-			const server = email.split('@').pop();
+			const server = lowerEmail.split('@').pop();
 
 			if(server === "ucf.edu")
 			{
@@ -126,9 +138,8 @@ exports.register = async function (req, res, next)
 
 				const newUser = {
 					UserID: userId,
-					Login: login,
 					Password: hashedPassword,
-					Email: email,
+					Email: lowerEmail,
 					FirstName: firstName,
 					LastName: lastName,
 					EmailVerified: false,
@@ -260,9 +271,11 @@ exports.forgotPassword = async function (req, res)
 			return res.status(400).json({error: 'Email is required'});
 		}
 
+		const lowerEmail = email.toLowerCase();
+
 		const users = db.collection('Users');
 
-		const user = await users.findOne({Email: email});
+		const user = await users.findOne({Email: lowerEmail});
 
 		const message = 'If the user exists, a password reset link has been sent to their email.';
 
