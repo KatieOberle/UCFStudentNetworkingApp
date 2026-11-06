@@ -3,6 +3,15 @@ const jwt = require('jsonwebtoken'); // initiate controller
 
 let db; 
 
+// Katie: fix keys
+const REASON_LABELS = {
+    harassment: 'Harassment',
+    innappropriate_content: 'Inappropriate Content',
+    spam: 'Spam',
+    impersonation: 'Impersonation',
+    other: 'Other'
+};
+
 exports.setDatabase = function (client) // connect database
 {
     if (!process.env.DB_NAME) // verify correct database
@@ -62,13 +71,7 @@ exports.createReport = async function (req, res) // user creates report function
         }
 
         // reportable offenses
-        const validReasons = [
-            'harassment',
-            'inappropriate_content',
-            'spam',
-            'impersonation',
-            'other'
-        ];
+        const validReasons = Object.keys(REASON_LABELS);
 
         if (!validReasons.includes(reason)) // check that reason entered
         {
@@ -150,12 +153,13 @@ exports.createReport = async function (req, res) // user creates report function
 
         // save report
         const newReport = {
-            reporterId: reporterId,
-            reportedUserId: targetId,
-            reason: reason,
-            description: (description || '').trim(),
-            status: 'pending',
-            createdAt: new Date()
+            ReportID: nextreporterId,
+            ReporterId: reporterId,
+            ReportedUserId: targetId,
+            Reason: REASON_LABELS[reason],
+            Details: (description || '').trim(),
+            Status: 'open',
+            CreatedAt: new Date()
         };
 
         const result = await reports.insertOne(newReport);
@@ -164,11 +168,11 @@ exports.createReport = async function (req, res) // user creates report function
         return res.status(201).json({
             message: 'Report submitted successfully',
             report: {
-                reportId: result.insertedId,
+                reportId: newReport.ReportID,
                 reportedUserId: targetId,
-                reason: newReport.reason,
-                status: newReport.status,
-                createdAt: newReport.createdAt
+                reason: newReport.Reason,
+                status: newReport.Status,
+                createdAt: newReport.CreatedAt
             }
         });
     }
@@ -225,14 +229,14 @@ exports.getMyReports = async function (req, res)
         // retrieve reports submitted by user
         const reports = await db.collection('Reports')
             .find(
-                {reporterId: reporterId},
+                {ReporterId: reporterId},
                 {
                     projection: {
-                        reporterId: 0
+                        ReporterId: 0
                     }
                 }
             )
-            .sort({createdAt: -1})
+            .sort({CreatedAt: -1})
             .toArray();
 
         return res.status(200).json({
@@ -252,6 +256,7 @@ exports.getMyReports = async function (req, res)
 
 // note: admin role needs to be established for this endpoint to work
 // retrieve user reports on admin end
+// TODO: add "Role":"admin" to a user in users.seed.js
 exports.getReportsForUser = async function (req, res)
 {
     try
@@ -328,16 +333,16 @@ exports.getReportsForUser = async function (req, res)
         // retrieve reports against target user
         const reports = await db.collection('Reports')
             .find(
-                {reportedUserId: targetId},
+                {ReportedUserId: targetId},
                 {
-                    projection: { reporterId: 0 } // find report IDs
+                    projection: { ReporterId: 0 } // find report IDs
                 }
             )
-            .sort({createdAt: -1}) // report id sorting
+            .sort({CreatedAt: -1}) // report id sorting
             .toArray();
 
         return res.status(200).json({
-            reportedUserId: targetId,
+            ReportedUserId: targetId,
             count: reports.length, // count used to determine account denial
             reports: reports
         });
