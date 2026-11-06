@@ -1,6 +1,3 @@
-
-const jwt = require('jsonwebtoken'); // initiate controller
-
 let db; 
 
 exports.setDatabase = function (client) // connect database
@@ -17,32 +14,6 @@ exports.createReport = async function (req, res) // user creates report function
 {
     try
     {
-        // require valid JWT
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith('Bearer '))
-        {
-            return res.status(401).json({
-                error: 'Token required'
-            });
-        }
-
-        let decoded;
-        // token decoding (private)
-        try
-        {
-            decoded = jwt.verify(
-                authHeader.split(' ')[1],
-                process.env.ACCESS_TOKEN_SECRET
-            );
-        }
-        catch (error) // stale token
-        {
-            return res.status(401).json({
-                error: 'Invalid or expired token'
-            });
-        }
-
         // read report details
         const {reportedUserId, reason, description} = req.body;
 
@@ -90,7 +61,7 @@ exports.createReport = async function (req, res) // user creates report function
             });
         }
 
-        const reporterId = Number(decoded.userId); // record user that reported
+        const reporterId = Number(req.params.userId); // record user that reported
 
         if (!Number.isSafeInteger(reporterId) || reporterId <= 0)
         {
@@ -187,33 +158,7 @@ exports.getMyReports = async function (req, res)
 {
     try
     {
-        // verify JWT
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith('Bearer '))
-        {
-            return res.status(401).json({
-                error: 'Token required' // token error message
-            });
-        }
-
-        let decoded;
-
-        try
-        {
-            decoded = jwt.verify(
-                authHeader.split(' ')[1],
-                process.env.ACCESS_TOKEN_SECRET // use .env token
-            );
-        }
-        catch (error)
-        {
-            return res.status(401).json({
-                error: 'Invalid or expired token'
-            });
-        }
-
-        const reporterId = Number(decoded.userId);
+        const reporterId = Number(req.params.userId);
 
         if (!Number.isSafeInteger(reporterId) || reporterId <= 0) // invalid id check
         {

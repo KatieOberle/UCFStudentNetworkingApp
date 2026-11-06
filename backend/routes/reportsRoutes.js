@@ -1,5 +1,5 @@
 // JWT reverification
-const authenticationMiddleware = require('../middleware/authenticationMiddleware.js')
+const authenticationMiddleware = require('../middleware/authMiddleware.js')
 
 // express routing for user reporting
 const express = require('express');
