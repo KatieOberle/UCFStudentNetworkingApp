@@ -1,5 +1,5 @@
 // JWT reverification
-const authenticationMiddleware = require('../middleware/authenticationMiddleware.js')
+const authenticationMiddleware = require('../middleware/authMiddleware.js')
 
 // express routing for user reporting
 const express = require('express');
@@ -11,8 +11,8 @@ const {
     getReportsForUser
 } = require('../controllers/reportsController'); // link to controller
 
-router.post('/path', authenticationMiddleware, createReport); // post report
-router.get('/path', authenticationMiddleware, getMyReports); // get reports info
-router.get('/path', authenticationMiddleware, getReportsForUser); // admin retrieval of user reports
+router.post('/path', authMiddleware, createReport); // post report
+router.get('/mine', authMiddleware, getMyReports); // get reports info
+router.get('/user/:userId', authMiddleware, getReportsForUser); // admin retrieval of user reports
 
 module.exports = router;
