@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage";
 import CheckEmailPage from "./pages/CheckEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ConnectionsPage from "./pages/ConnectionsPage";
 
 
 
@@ -71,6 +72,7 @@ if (page === "profile") {
       onDiscussionsClick={() => setPage("discussions")}
       onSearchClick={() => setPage("search")}
       onCommunitiesClick={() => setPage("communities")}
+      onConnectionsClick={() => setPage("connections")}
     />
   );
 }
@@ -93,6 +95,14 @@ if (page === "discussions") {
       onSearchClick={() => setPage("search")}
       onCommunitiesClick={() => setPage("communities")}
       onProfileClick={() => setPage("profile")}
+    />
+  );
+}
+
+if (page === "connections") {
+  return (
+    <ConnectionsPage
+      onBackClick={() => setPage("profile")}
     />
   );
 }

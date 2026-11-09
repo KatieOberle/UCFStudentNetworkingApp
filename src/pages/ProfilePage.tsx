@@ -1,8 +1,10 @@
+
 interface ProfilePageProps {
   onHomeClick: () => void;
   onDiscussionsClick: () => void;
   onSearchClick: () => void;
   onCommunitiesClick: () => void;
+  onConnectionsClick: () => void;
 }
 
 function ProfilePage({
@@ -10,6 +12,7 @@ function ProfilePage({
   onDiscussionsClick,
   onSearchClick,
   onCommunitiesClick,
+  onConnectionsClick,
 }: ProfilePageProps) {
   return (
     <div className="home-page">
@@ -22,7 +25,7 @@ function ProfilePage({
           </button>
 
           <button type="button" onClick={onDiscussionsClick}>
-           Discussions
+            Discussions
           </button>
 
           <button type="button" onClick={onSearchClick}>
@@ -33,7 +36,11 @@ function ProfilePage({
             Communities
           </button>
 
-          <button type="button" className="active-nav" aria-current="page">
+          <button
+            type="button"
+            className="active-nav"
+            aria-current="page"
+          >
             Profile
           </button>
         </nav>
@@ -44,12 +51,23 @@ function ProfilePage({
           <div>
             <h2>My Profile</h2>
             <p>
-              Manage your student information, interests, and networking
-              profile.
+              Manage your student information, interests,
+              and networking profile.
             </p>
           </div>
 
-          <button type="button">Edit Profile</button>
+          <div className="profile-actions">
+            <button type="button">
+              Edit Profile
+            </button>
+
+            <button
+              type="button"
+              onClick={onConnectionsClick}
+            >
+              My Connections
+            </button>
+          </div>
         </section>
 
         <section className="profile-grid">
@@ -89,3 +107,4 @@ function ProfilePage({
 }
 
 export default ProfilePage;
+
