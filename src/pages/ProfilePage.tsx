@@ -5,6 +5,7 @@ interface ProfilePageProps {
   onSearchClick: () => void;
   onCommunitiesClick: () => void;
   onConnectionsClick: () => void;
+  onEditProfileClick: () => void;
 }
 
 function ProfilePage({
@@ -13,6 +14,7 @@ function ProfilePage({
   onSearchClick,
   onCommunitiesClick,
   onConnectionsClick,
+  onEditProfileClick,
 }: ProfilePageProps) {
   return (
     <div className="home-page">
@@ -57,7 +59,7 @@ function ProfilePage({
           </div>
 
           <div className="profile-actions">
-            <button type="button">
+            <button type="button" onClick={onEditProfileClick}>
               Edit Profile
             </button>
 

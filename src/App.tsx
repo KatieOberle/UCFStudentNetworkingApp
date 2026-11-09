@@ -10,6 +10,7 @@ import CheckEmailPage from "./pages/CheckEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ConnectionsPage from "./pages/ConnectionsPage";
+import EditProfilePage from "./pages/EditProfilePage";
 
 
 
@@ -73,6 +74,7 @@ if (page === "profile") {
       onSearchClick={() => setPage("search")}
       onCommunitiesClick={() => setPage("communities")}
       onConnectionsClick={() => setPage("connections")}
+      onEditProfileClick={() => setPage("edit-profile")}
     />
   );
 }
@@ -102,6 +104,14 @@ if (page === "discussions") {
 if (page === "connections") {
   return (
     <ConnectionsPage
+      onBackClick={() => setPage("profile")}
+    />
+  );
+}
+
+if (page === "edit-profile") {
+  return (
+    <EditProfilePage
       onBackClick={() => setPage("profile")}
     />
   );
