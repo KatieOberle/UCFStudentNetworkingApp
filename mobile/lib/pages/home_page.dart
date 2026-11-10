@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'communities_page.dart';
+import 'discussions_page.dart';
 import '../main.dart';
 import 'login_page.dart';
+
 
 class HomePage extends StatelessWidget {
   const HomePage({
@@ -35,7 +37,18 @@ class HomePage extends StatelessWidget {
                   child: const Text('Home'),
                 ),
                 TextButton(
-                  onPressed: onDiscussionsClick,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DiscussionsPage(
+                          onHomeClick: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    );
+                  },
                   child: const Text('Discussions'),
                 ),
                 TextButton(
