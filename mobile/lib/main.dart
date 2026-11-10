@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'pages/communities_page.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
+
 
 void main() {
   runApp(const MyApp());

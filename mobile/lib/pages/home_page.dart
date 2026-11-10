@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'communities_page.dart';
 import '../main.dart';
 import 'login_page.dart';
 
@@ -43,7 +43,18 @@ class HomePage extends StatelessWidget {
                   child: const Text('Search'),
                 ),
                 TextButton(
-                  onPressed: onCommunitiesClick,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CommunitiesPage(
+                          onHomeClick: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                    );
+                  },
                   child: const Text('Communities'),
                 ),
                 TextButton(
