@@ -465,3 +465,78 @@ body {
     width: 100%;
   }
 }
+
+
+/* Create Thread Page */
+
+.create-thread-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.create-thread-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: bold;
+}
+
+.create-thread-form input,
+.create-thread-form textarea,
+.create-thread-form select {
+  width: 100%;
+  padding: 12px;
+  background-color: #17121f;
+  color: var(--text);
+  border: 1px solid #a38cb8;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.create-thread-form input:focus,
+.create-thread-form textarea:focus,
+.create-thread-form select:focus {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.create-thread-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.create-thread-actions button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  min-height: 44px;
+  background-color: var(--green);
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.create-thread-actions .cancel-button {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid #a38cb8;
+}
+
+.create-thread-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .create-thread-actions {
+    flex-direction: column;
+  }
+
+  .create-thread-actions button {
+    width: 100%;
+  }
+}
+

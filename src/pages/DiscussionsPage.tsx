@@ -3,6 +3,7 @@ interface DiscussionsPageProps {
   onSearchClick: () => void;
   onCommunitiesClick: () => void;
   onProfileClick: () => void;
+  onCreateThreadClick: () => void;
 }
 
 function DiscussionsPage({
@@ -10,6 +11,7 @@ function DiscussionsPage({
   onSearchClick,
   onCommunitiesClick,
   onProfileClick,
+  onCreateThreadClick,
 }: DiscussionsPageProps) {
   return (
     <div className="home-page">
@@ -46,7 +48,7 @@ function DiscussionsPage({
             </p>
           </div>
 
-          <button type="button">Create Thread</button>
+          <button type="button" onClick={onCreateThreadClick}>Create Thread</button>
         </section>
 
         <section className="discussion-section">

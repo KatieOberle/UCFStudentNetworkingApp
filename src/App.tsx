@@ -11,6 +11,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ConnectionsPage from "./pages/ConnectionsPage";
 import EditProfilePage from "./pages/EditProfilePage";
+import CreateThreadPage from "./pages/CreateThreadPage";
 
 
 
@@ -97,6 +98,7 @@ if (page === "discussions") {
       onSearchClick={() => setPage("search")}
       onCommunitiesClick={() => setPage("communities")}
       onProfileClick={() => setPage("profile")}
+      onCreateThreadClick={() => setPage("create-thread")}
     />
   );
 }
@@ -113,6 +115,14 @@ if (page === "edit-profile") {
   return (
     <EditProfilePage
       onBackClick={() => setPage("profile")}
+    />
+  );
+}
+
+if (page === "create-thread") {
+  return (
+    <CreateThreadPage
+      onBackClick={() => setPage("discussions")}
     />
   );
 }
