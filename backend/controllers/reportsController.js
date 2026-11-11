@@ -140,8 +140,8 @@ exports.createReport = async function (req, res) // user creates report function
         const reports = db.collection('Reports');
 
         const existingReport = await reports.findOne({
-            reporterId: reporterId,
-            reportedUserId: targetId
+            ReporterId: reporterId,
+            ReportedUserId: targetId
         });
 
         if (existingReport)
@@ -151,10 +151,13 @@ exports.createReport = async function (req, res) // user creates report function
             });
         }
 
-	const nextreporterId = await reports.find({})
+	const lastReport = await reports.find({})
                 .sort({ReportID: -1})
                 .limit(1)
                 .next();	
+console.log(lastReport);
+console.log(typeof lastReport?.ReportID);
+	const nextreporterId = lastReport ? Number(lastReport.ReportID) + 1 : 1;
 
         // save report
         const newReport = {
@@ -169,16 +172,31 @@ exports.createReport = async function (req, res) // user creates report function
 
         const result = await reports.insertOne(newReport);
 
+	// Count reports received by the reported user
+	const reportCount = await reports.countDocuments({ReportedUserId: targetId});
+
+	// Automatically delete account after 10 reports
+	let accountDeleted = false;
+
+	if (reportCount >= 10)
+	{
+	    await users.deleteOne({UserID: targetId});
+
+	    accountDeleted = true;
+	}
         // confirmation message
         return res.status(201).json({
-            message: 'Report submitted successfully',
+		message: accountDeleted ? 'Report submitted successfully. Reported user has been deleted' : 'Report submitted successfully',
             report: {
                 reportId: newReport.ReportID,
                 reportedUserId: targetId,
                 reason: newReport.Reason,
                 status: newReport.Status,
                 createdAt: newReport.CreatedAt
-            }
+            },
+
+		reportCount: reportCount,
+		accountDeleted: accountDeleted
         });
     }
     catch (error)
