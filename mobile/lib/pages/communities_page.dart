@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
+import 'discussions_page.dart';
+import 'search_page.dart';
+import 'profile_page.dart';
 
 class CommunitiesPage extends StatelessWidget {
   const CommunitiesPage({
@@ -25,11 +29,55 @@ class CommunitiesPage extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                TextButton(onPressed: onHomeClick, child: const Text('Home')),
-                TextButton(onPressed: onDiscussionsClick, child: const Text('Discussions')),
-                TextButton(onPressed: onSearchClick, child: const Text('Search')),
-                TextButton(onPressed: () {}, child: const Text('Communities')),
-                TextButton(onPressed: onProfileClick, child: const Text('Profile')),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(token: ''),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  child: const Text('Home'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DiscussionsPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Discussions'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SearchPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Search'),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text('Communities'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Profile'),
+                ),
               ],
             ),
           ),
@@ -43,28 +91,43 @@ class CommunitiesPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Communities', style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  'Communities',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 12),
-                const Text('Discover student communities or create one around shared interests.'),
+                const Text(
+                  'Discover student communities or create one around shared interests.',
+                ),
                 const SizedBox(height: 20),
-                FilledButton(onPressed: () {}, child: const Text('Create Community')),
+                FilledButton(
+                  onPressed: () {},
+                  child: const Text('Create Community'),
+                ),
                 const SizedBox(height: 32),
                 Row(
                   children: [
                     const Expanded(
                       child: TextField(
-                        decoration: InputDecoration(hintText: 'Search communities...'),
+                        decoration: InputDecoration(
+                          hintText: 'Search communities...',
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    FilledButton(onPressed: () {}, child: const Text('Search')),
+                    FilledButton(
+                      onPressed: () {},
+                      child: const Text('Search'),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(48),
-                  child: const Center(child: Text('Search for communities to see results.')),
+                  child: const Center(
+                    child: Text('Search for communities to see results.'),
+                  ),
                 ),
               ],
             ),

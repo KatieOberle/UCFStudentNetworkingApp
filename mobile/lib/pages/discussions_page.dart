@@ -1,4 +1,9 @@
+
 import 'package:flutter/material.dart';
+import 'home_page.dart';
+import 'search_page.dart';
+import 'communities_page.dart';
+import 'profile_page.dart';
 
 class DiscussionsPage extends StatelessWidget {
   const DiscussionsPage({
@@ -26,7 +31,15 @@ class DiscussionsPage extends StatelessWidget {
             child: Row(
               children: [
                 TextButton(
-                  onPressed: onHomeClick,
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(token: ''),
+                      ),
+                      (route) => false,
+                    );
+                  },
                   child: const Text('Home'),
                 ),
                 TextButton(
@@ -34,15 +47,36 @@ class DiscussionsPage extends StatelessWidget {
                   child: const Text('Discussions'),
                 ),
                 TextButton(
-                  onPressed: onSearchClick,
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SearchPage(),
+                      ),
+                    );
+                  },
                   child: const Text('Search'),
                 ),
                 TextButton(
-                  onPressed: onCommunitiesClick,
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CommunitiesPage(),
+                      ),
+                    );
+                  },
                   child: const Text('Communities'),
                 ),
                 TextButton(
-                  onPressed: onProfileClick,
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    );
+                  },
                   child: const Text('Profile'),
                 ),
               ],
