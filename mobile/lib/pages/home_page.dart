@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'communities_page.dart';
 import 'discussions_page.dart';
+import 'search_page.dart';
+import 'profile_page.dart';
 import '../main.dart';
 import 'login_page.dart';
 
@@ -52,9 +54,20 @@ class HomePage extends StatelessWidget {
                   child: const Text('Discussions'),
                 ),
                 TextButton(
-                  onPressed: onSearchClick,
-                  child: const Text('Search'),
-                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchPage(
+                        onHomeClick: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Search'),
+              ),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
@@ -71,9 +84,20 @@ class HomePage extends StatelessWidget {
                   child: const Text('Communities'),
                 ),
                 TextButton(
-                  onPressed: onProfileClick,
-                  child: const Text('Profile'),
-                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                        onHomeClick: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Profile'),
+              ),
               ],
             ),
           ),
