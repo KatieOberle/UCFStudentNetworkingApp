@@ -99,15 +99,9 @@ exports.logout = async function (req, res)
     });
 };
 
+
 exports.register = async function (req, res, next)
 {
-	// incoming: login, password, email, firstName, lastName
-	// outgoing: error
-	
-	// Placeholder error variable
-	var error = '';
-
-	// Request body follows this key/value format
 	const {password, email, firstName, lastName} = req.body;
 
 	if(!email || !password)
@@ -115,27 +109,10 @@ exports.register = async function (req, res, next)
 		return res.status(400).json({error: 'Email and password are required'});
 	}
 
-
 	const lowerEmail = email.toLowerCase();
-
-	// AI assisted code
-	const hashedPassword = await bcrypt.hash(password, 10);
-
-	// AI assisted code
-	const verifyToken = crypto.randomBytes(32).toString('hex');
-	const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-	// TODO: Add new UserId to this
 
 	try
 	{
-		const dup = await db.collection('Users').find({Email:lowerEmail}).toArray();
-
-		if(dup.length > 0)
-		{
-			return res.status(409).json({error: 'Email already registered'});
-		}
-
 		const server = lowerEmail.split('@').pop();
 
 		if(server !== "ucf.edu")
@@ -143,24 +120,58 @@ exports.register = async function (req, res, next)
 			return res.status(400).json({error: 'Email must be a UCF email'});
 		}
 
-		const lastUser = await db.collection('Users').find({}).sort({UserID: -1}).limit(1).next();
-		const userId = lastUser ? lastUser.UserID + 1 : 1;
+		const users = db.collection('Users');
+		const existingUser = await users.findOne({Email: lowerEmail});
 
-		const newUser = {
-			UserID: userId,
-			Password: hashedPassword,
-			Email: lowerEmail,
-			FirstName: firstName,
-			LastName: lastName,
-			EmailVerified: false,
-			VerifyToken: verifyToken,
-			VerifyExpires: verifyExpires
-		};
-		const result = await db.collection('Users').insertOne(newUser);
+		if(existingUser && existingUser.EmailVerified)
+		{
+			return res.status(409).json({error: 'Email already registered'});
+		}
 
-		// AI assisted code
-		const verificationLink =`${getAppUrl()}/verify-email?token=${verifyToken}`;
-		console.log('Verification link:', verificationLink);
+		// Generate a new verification token
+		const verifyToken = crypto.randomBytes(32).toString('hex');
+		const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+		let userId;
+
+		if(existingUser)
+		{
+			// Update existing unverified account
+			userId = existingUser.UserID;
+
+			await users.updateOne(
+				{_id: existingUser._id},
+				{
+					$set: {
+						VerifyToken: verifyToken,
+						VerifyExpires: verifyExpires
+					}
+				}
+			);
+		}
+		else
+		{
+			// Create new account
+			const hashedPassword = await bcrypt.hash(password, 10);
+
+			const lastUser = await users.find({}).sort({UserID: -1}).limit(1).next();
+			userId = lastUser ? lastUser.UserID + 1 : 1;
+
+			const newUser = {
+				UserID: userId,
+				Password: hashedPassword,
+				Email: lowerEmail,
+				FirstName: firstName,
+				LastName: lastName,
+				EmailVerified: false,
+				VerifyToken: verifyToken,
+				VerifyExpires: verifyExpires
+			};
+
+			await users.insertOne(newUser);
+		}
+
+		const verificationLink = `${getAppUrl()}/verify-email?token=${verifyToken}`;
 
 		try
 		{
@@ -178,20 +189,14 @@ exports.register = async function (req, res, next)
 		{
 			console.error('Verification email failed: ', mailError);
 
-			// remove account so user can try again
-			await db.collection('Users').deleteOne({_id:result.insertedId});
-
 			return res.status(500).json({
-				error:
-				'Could not send verification email'
+				error: 'Could not send verification email'
 			});
 		}
 
 		return res.status(201).json({
-			error:
-			'',
-			message:
-			'Yay registration successful! Check your email for verification :)'
+			error: '',
+			message: 'Yay registration successful! Check your email for verification :)'
 		});
 	}
 	catch(e)
@@ -199,11 +204,11 @@ exports.register = async function (req, res, next)
 		console.error('Registration error: ', e);
 
 		return res.status(500).json({
-			error:
-			'Server error during registration'
+			error: 'Server error during registration'
 		});
 	}
 };
+
 
 // AI assisted code
 exports.verifyEmail = async function (req, res)
