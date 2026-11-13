@@ -3,6 +3,7 @@ import '../main.dart' show postJson, firstNameFromToken, pageLayout, textField, 
 import 'register_page.dart';
 import 'home_page.dart';
 import 'forgot_password_page.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // ---------------------------------------------------------------------------
 // Login page: POST /api/auth/login { email, password }
@@ -16,8 +17,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _storage = FlutterSecureStorage();
   final _email = TextEditingController();
   final _password = TextEditingController();
+
   String _message = '';
   bool _loading = false;
 
@@ -51,13 +54,18 @@ class _LoginPageState extends State<LoginPage> {
 
       // The backend may return HTTP 200 with { error } on login failure.
       final token = data['accessToken'];
-      if (data['error'] == null && token is String && token.isNotEmpty) {
-        // Logged in: go to the home page and pass the token along.
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => HomePage(token: token)),
-        );
-        return;
-      }
+          if (token is String && token.isNotEmpty) {
+      await _storage.write(key: 'jwt_token', value: token);
+
+      if (!mounted) return;
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => HomePage(token: token),
+        ),
+      );
+      return;
+    }
 
       setState(() {
         _loading = false;
