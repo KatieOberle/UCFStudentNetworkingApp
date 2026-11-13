@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../main.dart' show postJson, firstNameFromToken, pageLayout, textField, statusMessage;
 import 'register_page.dart';
 import 'home_page.dart';
+import 'forgot_password_page.dart';
 
 // ---------------------------------------------------------------------------
 // Login page: POST /api/auth/login { email, password }
@@ -48,8 +49,9 @@ class _LoginPageState extends State<LoginPage> {
       });
       if (!mounted) return;
 
+      // The backend may return HTTP 200 with { error } on login failure.
       final token = data['accessToken'];
-      if (token is String) {
+      if (data['error'] == null && token is String && token.isNotEmpty) {
         // Logged in: go to the home page and pass the token along.
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => HomePage(token: token)),
@@ -73,6 +75,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return pageLayout(context, 'Log In', [
+      const Text('KnightLink', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+      const Text('UCF Student Networking'),
+      const SizedBox(height: 12),
       textField(_email, 'UCF Email'),
       textField(_password, 'Password', obscure: true),
       const SizedBox(height: 4),
@@ -84,6 +89,18 @@ class _LoginPageState extends State<LoginPage> {
       const SizedBox(height: 8),
       TextButton(
         onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ForgotPasswordPage(
+              onLoginClick: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ),
+        child: const Text('Forgot password?'),
+      ),
+      TextButton(
+        onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const RegisterPage()),
         ),
         child: const Text("Don't have an account? Sign up"),
@@ -91,4 +108,3 @@ class _LoginPageState extends State<LoginPage> {
     ]);
   }
 }
-
