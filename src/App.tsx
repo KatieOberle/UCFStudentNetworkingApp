@@ -16,7 +16,12 @@ function App() {
   const [page, setPage] = useState("login");
 
   if (page === "signup") {
-    return <SignupPage onLoginClick={() => setPage("login")} />;
+    return (
+      <SignupPage
+        onLoginClick={() => setPage("login")}
+        onRegistered={() => setPage("check-email")}
+      />
+    );
   }
  if (page === "check-email") {
   return (
