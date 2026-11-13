@@ -10,7 +10,7 @@ let db;
 function getAppUrl()
 {
 	return (process.env.APP_URL || 
-		'http://localhost:5173').replace(/\/+$/, '');
+		'http://cop4331-fall-26-heckman.online:5173').replace(/\/+$/, '');
 }
 
 exports.setDatabase = function (client)
