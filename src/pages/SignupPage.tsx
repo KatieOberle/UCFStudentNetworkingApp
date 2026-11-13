@@ -1,21 +1,35 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 interface SignupPageProps {
   onLoginClick: () => void;
+  onRegistered: () => void;
 }
 
-function SignupPage({ onLoginClick }: SignupPageProps) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+function SignupPage({ onLoginClick, onRegistered }: SignupPageProps) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+
+    const form = new FormData(event.currentTarget);
+
+    const firstName = String(form.get("firstName") ?? "").trim();
+    const lastName = String(form.get("lastName") ?? "").trim();
+    const email = String(form.get("email") ?? "").trim();
+    const password = String(form.get("password") ?? "");
+    const confirmPassword = String(form.get("confirmPassword") ?? "");
+
+    if (!/^[^\s@]+@ucf\.edu$/i.test(email)) {
+      setError("You must register using a valid @ucf.edu email.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -25,13 +39,11 @@ function SignupPage({ onLoginClick }: SignupPageProps) {
     setLoading(true);
 
     try {
-      //                             api/auth/register is placeholder for the actual backend endpoint for registration, real name may differ based on backend implementation
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           firstName,
           lastName,
@@ -40,24 +52,20 @@ function SignupPage({ onLoginClick }: SignupPageProps) {
         }),
       });
 
+      // The backend returns HTTP 200 with a non-empty { error } when
+      // registration fails, so check the body too.
       const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(
-          data?.message || data?.error || "Registration failed."
-        );
+      if (!response.ok || data?.error) {
+        throw new Error(data?.error || "Registration failed.");
       }
 
-      alert("Registration successful!");
-      onLoginClick();
+      onRegistered();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Registration failed."
-      );
+      setError(err instanceof Error ? err.message : "Registration failed.");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="login-page">
@@ -65,14 +73,13 @@ function SignupPage({ onLoginClick }: SignupPageProps) {
         <h1>Create Account</h1>
         <h2>Join KnightLink</h2>
 
-        <form onSubmit={handleRegister}>
+        <form onSubmit={handleSubmit}>
           <label>
             First Name
             <input
+              name="firstName"
               type="text"
-              placeholder="Enter first name"
-              value={firstName}
-              onChange={(event) => setFirstName(event.target.value)}
+              autoComplete="given-name"
               required
             />
           </label>
@@ -80,10 +87,9 @@ function SignupPage({ onLoginClick }: SignupPageProps) {
           <label>
             Last Name
             <input
+              name="lastName"
               type="text"
-              placeholder="Enter last name"
-              value={lastName}
-              onChange={(event) => setLastName(event.target.value)}
+              autoComplete="family-name"
               required
             />
           </label>
@@ -91,40 +97,46 @@ function SignupPage({ onLoginClick }: SignupPageProps) {
           <label>
             UCF Email
             <input
+              name="email"
               type="email"
               placeholder="name@ucf.edu"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
               required
             />
           </label>
+          <small>Only @ucf.edu email addresses are allowed.</small>
 
           <label>
             Password
             <input
+              name="password"
               type="password"
-              placeholder="Create password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              minLength={8}
+              autoComplete="new-password"
               required
             />
           </label>
+          <small>Minimum 8 characters.</small>
 
           <label>
             Confirm Password
             <input
+              name="confirmPassword"
               type="password"
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
+              minLength={8}
+              autoComplete="new-password"
               required
             />
           </label>
 
-          {error && <p role="alert">{error}</p>}
+          {error && (
+            <p role="alert" className="form-error">
+              {error}
+            </p>
+          )}
 
           <button type="submit" disabled={loading}>
-            {loading ? "Registering..." : "Sign Up"}
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
