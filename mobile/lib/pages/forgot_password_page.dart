@@ -13,22 +13,51 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController emailController = TextEditingController();
   String message = '';
+  bool loading = false;
+  bool isError = true;
 
-  void handleSubmit() {
+    Future<void> handleSubmit() async {
     final email = emailController.text.trim();
     final emailRegex = RegExp(r'^[^\s@]+@ucf\.edu$', caseSensitive: false);
 
     if (!emailRegex.hasMatch(email)) {
       setState(() {
         message = 'Please enter a valid @ucf.edu email address.';
+        isError = true;
       });
       return;
     }
 
-    // Password reset API will be connected here.
     setState(() {
-      message = 'Password reset is not connected to the server yet.';
+      loading = true;
+      message = '';
     });
+
+    try {
+      final data = await postJson('/api/auth/forgot-password', {
+        'email': email,
+      });
+
+      if (!mounted) return;
+
+      final error = data['error']?.toString() ?? '';
+
+      setState(() {
+        loading = false;
+        isError = error.isNotEmpty;
+        message = error.isNotEmpty
+            ? error
+            : 'If an account exists for this email, a password reset link will be sent.';
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        loading = false;
+        isError = true;
+        message = 'Could not reach the server. Please try again.';
+      });
+    }
   }
 
   @override
@@ -98,7 +127,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   Text(
                     message,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+                    style: TextStyle(
+                      color: isError ? Colors.redAccent : Colors.greenAccent,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
                 const SizedBox(height: 24),
