@@ -1,9 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'discussions_page.dart';
 import 'search_page.dart';
 import 'communities_page.dart';
+import 'edit_profile_page.dart';
+import 'connections_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({
@@ -103,38 +104,43 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   FilledButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProfilePage(
+                            onBackClick: () => Navigator.pop(context),
+                          ),
+                        ),
+                      );
+                    },
                     child: const Text('Edit Profile'),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ConnectionsPage(
+                            onBackClick: () => Navigator.pop(context),
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('My Connections'),
                   ),
                   const SizedBox(height: 32),
                   Wrap(
                     spacing: 16,
                     runSpacing: 16,
                     children: [
-                      profileCard(
-                        'Name',
-                        'Your name will appear here.',
-                      ),
-                      profileCard(
-                        'Major',
-                        'Your major will appear here.',
-                      ),
-                      profileCard(
-                        'Career Interests',
-                        'Your career interests will appear here.',
-                      ),
-                      profileCard(
-                        'Company Affiliations',
-                        'Your company affiliations will appear here.',
-                      ),
-                      profileCard(
-                        'Contact Information',
-                        'Your contact information will appear here.',
-                      ),
-                      profileCard(
-                        'My Discussions',
-                        'Your discussion threads will appear here.',
-                      ),
+                      profileCard('Name', 'Your name will appear here.'),
+                      profileCard('Major', 'Your major will appear here.'),
+                      profileCard('Career Interests', 'Your career interests will appear here.'),
+                      profileCard('Company Affiliations', 'Your company affiliations will appear here.'),
+                      profileCard('Contact Information', 'Your contact information will appear here.'),
+                      profileCard('My Discussions', 'Your discussion threads will appear here.'),
                     ],
                   ),
                 ],
@@ -155,10 +161,7 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               Text(description),
             ],
