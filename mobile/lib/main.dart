@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      home: const HomePage(token: ''), // TEMPORARY: restore LoginPage() before committing
+      home: const LoginPage(), 
     );
   }
 }
