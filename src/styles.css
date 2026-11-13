@@ -540,3 +540,315 @@ body {
   }
 }
 
+
+/* Thread Detail and Replies */
+
+.thread-detail-card,
+.thread-reply-card,
+.thread-reply-form-section {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.thread-detail-header,
+.thread-reply-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.thread-detail-card h2,
+.thread-replies-section h2,
+.thread-reply-form-section h2 {
+  margin-top: 0;
+}
+
+.thread-meta {
+  color: #c8bdd2;
+  font-size: 0.875rem;
+  margin-top: 8px;
+}
+
+.thread-body {
+  margin-top: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+
+.thread-replies-section,
+.thread-reply-form-section {
+  margin-top: 28px;
+}
+
+.thread-replies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.thread-reply-card p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.thread-delete-button {
+  background-color: transparent;
+  color: #ff9090;
+  border: 1px solid #ff9090;
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.thread-delete-button:hover {
+  background-color: #442126;
+}
+
+.thread-reply-form-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.thread-reply-form-section textarea {
+  width: 100%;
+  padding: 12px;
+  color: var(--text);
+  background-color: #17121f;
+  border: 1px solid #a38cb8;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.thread-reply-form-section textarea:focus {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.thread-reply-form-section button[type="submit"] {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 12px 20px;
+  color: #111;
+  background-color: var(--green);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.thread-reply-form-section button:disabled,
+.thread-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .thread-detail-card,
+  .thread-reply-card,
+  .thread-reply-form-section {
+    padding: 16px;
+  }
+
+  .thread-reply-form-section button[type="submit"] {
+    width: 100%;
+  }
+}
+
+
+/* Student Search Results */
+
+.student-results {
+  margin-top: 24px;
+}
+
+.student-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.student-result-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  overflow-wrap: anywhere;
+}
+
+.student-result-card h3 {
+  margin: 12px 0;
+}
+
+.student-result-card p {
+  line-height: 1.5;
+}
+
+.student-avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: var(--green);
+  color: #111;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.student-result-card button {
+  margin-top: 12px;
+  padding: 12px 16px;
+  min-height: 44px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--green);
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.student-result-card button:hover {
+  filter: brightness(1.1);
+}
+
+.report-user-button {
+  background-color: transparent;
+  border: 1px solid #ff9090;
+  color: #ff9090;
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.form-success {
+  color: var(--green);
+  margin: 12px 0;
+}
+
+@media (max-width: 480px) {
+  .student-result-card {
+    padding: 16px;
+  }
+
+  .student-result-card button {
+    width: 100%;
+  }
+}
+
+
+/* Report User Page */
+
+.report-user-description {
+  margin-bottom: 24px;
+  font-size: 1rem;
+}
+
+.report-user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.report-user-form label {
+  font-weight: bold;
+}
+
+.report-user-form select,
+.report-user-form textarea {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid #a38cb8;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.report-user-form select:focus,
+.report-user-form textarea:focus {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.report-user-form small {
+  color: #c8bdd2;
+}
+
+.report-user-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.report-user-actions button {
+  min-height: 44px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--green);
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.report-user-actions .cancel-button {
+  background-color: var(--surface);
+  border: 1px solid #a38cb8;
+  color: var(--text);
+}
+
+.report-user-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .report-user-actions {
+    flex-direction: column;
+  }
+
+  .report-user-actions button {
+    width: 100%;
+  }
+}
+
+
+/* Logout Navigation */
+
+.top-nav .logout-button {
+  border: 1px solid #ff9090;
+  background-color: transparent;
+  color: #ffb3b3;
+  border-radius: 8px;
+  padding: 10px 14px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.top-nav .logout-button:hover {
+  background-color: #442126;
+}
+
+.top-nav .logout-button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .top-nav .logout-button {
+    width: 100%;
+  }
+}
+

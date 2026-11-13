@@ -6,6 +6,8 @@ interface ProfilePageProps {
   onCommunitiesClick: () => void;
   onConnectionsClick: () => void;
   onEditProfileClick: () => void;
+  onLogoutClick: () => void;
+  logoutError?: string;
 }
 
 function ProfilePage({
@@ -15,13 +17,15 @@ function ProfilePage({
   onCommunitiesClick,
   onConnectionsClick,
   onEditProfileClick,
+  onLogoutClick,
+  logoutError,
 }: ProfilePageProps) {
   return (
     <div className="home-page">
       <header className="top-nav">
         <h1>KnightLink</h1>
 
-        <nav>
+        <nav aria-label="Main navigation">
           <button type="button" onClick={onHomeClick}>
             Home
           </button>
@@ -45,10 +49,24 @@ function ProfilePage({
           >
             Profile
           </button>
+
+          <button
+            type="button"
+            className="logout-button"
+            onClick={onLogoutClick}
+          >
+            Log Out
+          </button>
         </nav>
       </header>
 
       <main className="home-content">
+        {logoutError && (
+          <p role="alert" className="form-error">
+            {logoutError}
+          </p>
+        )}
+
         <section className="profile-header">
           <div>
             <h2>My Profile</h2>
@@ -59,7 +77,10 @@ function ProfilePage({
           </div>
 
           <div className="profile-actions">
-            <button type="button" onClick={onEditProfileClick}>
+            <button
+              type="button"
+              onClick={onEditProfileClick}
+            >
               Edit Profile
             </button>
 
@@ -109,4 +130,3 @@ function ProfilePage({
 }
 
 export default ProfilePage;
-
