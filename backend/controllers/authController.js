@@ -2,8 +2,16 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const token = require("../createJWT.js");
+const {sendEmail} = require('../utils/mailer');
 
 let db;
+
+// base URL in links sent by email
+function getAppUrl()
+{
+	return (process.env.APP_URL || 
+		'http://localhost:5173').replace(/\/+$/, '');
+}
 
 exports.setDatabase = function (client)
 {
@@ -125,46 +133,76 @@ exports.register = async function (req, res, next)
 
 		if(dup.length > 0)
 		{
-			error = 'Email already registered';
+			return res.status(409).json({error: 'Email already registered'});
 		}
-		else
+
+		const server = lowerEmail.split('@').pop();
+
+		if(server !== "ucf.edu")
 		{
-			const server = lowerEmail.split('@').pop();
-
-			if(server === "ucf.edu")
-			{
-				const lastUser = await db.collection('Users').find({}).sort({UserID: -1}).limit(1).next();
-				const userId = lastUser ? lastUser.UserID + 1 : 1;
-
-				const newUser = {
-					UserID: userId,
-					Password: hashedPassword,
-					Email: lowerEmail,
-					FirstName: firstName,
-					LastName: lastName,
-					EmailVerified: false,
-					VerifyToken: verifyToken,
-					VerifyExpires: verifyExpires
-				};
-				const result = await db.collection('Users').insertOne(newUser);
-
-				// AI assisted code
-				const verificationLink =`http://localhost:5000/api/auth/verify?token=${verifyToken}`;
-				console.log('Verification link:', verificationLink);
-			}
-			else
-			{
-				error = 'Email must be a UCF email';
-			}
+			return res.status(400).json({error: 'Email must be a UCF email'});
 		}
+
+		const lastUser = await db.collection('Users').find({}).sort({UserID: -1}).limit(1).next();
+		const userId = lastUser ? lastUser.UserID + 1 : 1;
+
+		const newUser = {
+			UserID: userId,
+			Password: hashedPassword,
+			Email: lowerEmail,
+			FirstName: firstName,
+			LastName: lastName,
+			EmailVerified: false,
+			VerifyToken: verifyToken,
+			VerifyExpires: verifyExpires
+		};
+		const result = await db.collection('Users').insertOne(newUser);
+
+		// AI assisted code
+		const verificationLink =`${getAppUrl()}/verify-email?token=${verifyToken}`;
+		console.log('Verification link:', verificationLink);
+
+		try
+		{
+			await sendEmail({
+				to: lowerEmail,
+				subject: 'Please verify your email',
+				text: 'Boo! Gurl click this link to verify your ' +
+					'KnightLink account (valid 24 hours):\n\n' + verificationLink,
+				html: '<p>Boo! Gurl click this link to verify your ' +
+					'KnightLink account (valid 24 hours):</p>' +
+					`<p><a href="${verificationLink}">${verificationLink}</a></p>`
+			});
+		}
+		catch(mailError)
+		{
+			console.error('Verification email failed: ', mailError);
+
+			// remove account so user can try again
+			await db.collection('Users').deleteOne({_id:result.insertedId});
+
+			return res.status(500).json({
+				error:
+				'Could not send verification email'
+			});
+		}
+
+		return res.status(201).json({
+			error:
+			'',
+			message:
+			'Yay registration successful! Check your email for verification :)'
+		});
 	}
 	catch(e)
 	{
-		error = e.toString();
-	}
+		console.error('Registration error: ', e);
 
-	var ret = {error:error};
-	res.status(200).json(ret);
+		return res.status(500).json({
+			error:
+			'Server error during registration'
+		});
+	}
 };
 
 // AI assisted code
@@ -297,8 +335,25 @@ exports.forgotPassword = async function (req, res)
 			}
 		);
 
-		const resetLink =`http://localhost:5000/api/reset-password?token=${resetToken}`;
-		console.log('Password reset link:', resetLink);
+		const resetLink = `${getAppUrl()}/reset-password?token=${resetToken}`;
+
+		try
+		{
+			await sendEmail({
+				to: lowerEmail,
+				subject: 'Reset your password',
+				text: `We received a request to reset your password. Open this link (valid for 1 hour):\n\n${resetLink}\n\nIf you did not request this, you can ignore this email.`,
+				html: `<p>We received a request to reset your password. Click the link below (valid for 1 hour):</p><p><a href="${resetLink}">${resetLink}</a></p><p>If you did not request this, you can ignore this email.</p>`
+			});
+		}
+		catch(mailError)
+		{
+			console.error('Password reset email failed:', mailError);
+
+			return res.status(500).json({
+				error: 'Could not send password reset email. Please try again later.'
+			});
+		}
 
 		return res.status(200).json({message});
 	}
