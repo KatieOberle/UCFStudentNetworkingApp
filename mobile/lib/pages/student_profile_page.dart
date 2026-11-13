@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'report_user_page.dart';
 /// Student details supplied by the Search page.
 class Student {
   final String id;
@@ -86,14 +86,23 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
   }
 
   void _handleReport() {
-    final student = widget.student;
-    if (student == null) return;
-    if (widget.onReportClick == null) {
-      setState(() => error = 'User reporting is not available yet.');
-      return;
-    }
-    widget.onReportClick!(student);
-  }
+  final student = widget.student;
+  if (student == null) return;
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ReportUserPage(
+        student: ReportStudent(
+          id: student.id,
+          firstName: student.firstName,
+          lastName: student.lastName,
+        ),
+        onBackClick: () => Navigator.pop(context),
+      ),
+    ),
+  );
+}
 
   Widget _detailCard(BuildContext context, String heading, Widget content) {
     return Card(

@@ -3,6 +3,7 @@ import 'home_page.dart';
 import 'discussions_page.dart';
 import 'communities_page.dart';
 import 'profile_page.dart';
+import 'student_profile_page.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({
@@ -126,6 +127,20 @@ class SearchPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StudentProfilePage(
+                                student: null,
+                                onBackClick: () => Navigator.pop(context),
+                              ),
+                            ),
+                          );
+                        },
+                        child: const Text('View Student Profile'),
+                      ),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(48),

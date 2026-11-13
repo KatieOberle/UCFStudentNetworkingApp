@@ -4,6 +4,8 @@ import 'home_page.dart';
 import 'search_page.dart';
 import 'communities_page.dart';
 import 'profile_page.dart';
+import 'create_thread_page.dart';
+import 'thread_detail_page.dart';
 
 class DiscussionsPage extends StatelessWidget {
   const DiscussionsPage({
