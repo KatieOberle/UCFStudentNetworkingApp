@@ -5,7 +5,7 @@ import 'search_page.dart';
 import 'profile_page.dart';
 import '../main.dart';
 import 'login_page.dart';
-
+import 'create_thread_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
@@ -35,7 +35,16 @@ class HomePage extends StatelessWidget {
             child: Row(
               children: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CreateThreadPage(
+                        onBackClick: () => Navigator.pop(context),
+                      ),
+                    ),
+                  );
+                },
                   child: const Text('Home'),
                 ),
                 TextButton(
