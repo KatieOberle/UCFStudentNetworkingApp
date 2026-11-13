@@ -135,14 +135,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: handleSubmit,
+                  onPressed: loading ? null : handleSubmit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF561787),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: const Text('Request Password Reset', style: TextStyle(fontSize: 16)),
+                  child: Text(
+                    loading ? 'Sending...' : 'Request Password Reset',
+                    style: const TextStyle(fontSize: 16),
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Wrap(
