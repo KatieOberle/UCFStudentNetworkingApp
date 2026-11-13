@@ -35,7 +35,10 @@ class MyApp extends StatelessWidget {
 // Address of our Express backend.
 // Browser (Chrome/Firefox) or iOS simulator: localhost works.
 // Android emulator: change this to 'http://10.0.2.2:5000'.
-const String apiBase = 'http://localhost:5000';
+const String apiBase = String.fromEnvironment(
+  'API_BASE_URL',
+  defaultValue: 'http://localhost:5000',
+);
 
 /// Sends a POST request with a JSON body to the backend and returns the
 /// JSON response. Our backend replies with { error: "..." } when something
