@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../main.dart' show postJson;
 
 class ForgotPasswordPage extends StatefulWidget {
   final VoidCallback onLoginClick;
