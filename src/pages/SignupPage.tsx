@@ -1,20 +1,22 @@
-
 import { useState, type FormEvent } from "react";
 
 interface SignupPageProps {
   onLoginClick: () => void;
-  registrationError?: string;
+  onRegistered: () => void;
 }
 
-function SignupPage({ onLoginClick, registrationError, }: SignupPageProps) {
+function SignupPage({ onLoginClick, onRegistered }: SignupPageProps) {
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
 
     const form = new FormData(event.currentTarget);
 
+    const firstName = String(form.get("firstName") ?? "").trim();
+    const lastName = String(form.get("lastName") ?? "").trim();
     const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
     const confirmPassword = String(form.get("confirmPassword") ?? "");
@@ -34,8 +36,35 @@ function SignupPage({ onLoginClick, registrationError, }: SignupPageProps) {
       return;
     }
 
-    // API registration will be connected by the functionality developer.
-    setError("Registration is not connected to the server yet.");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+        }),
+      });
+
+      // The backend returns HTTP 200 with a non-empty { error } when
+      // registration fails, so check the body too.
+      const data = await response.json().catch(() => null);
+      if (!response.ok || data?.error) {
+        throw new Error(data?.error || "Registration failed.");
+      }
+
+      onRegistered();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -100,13 +129,15 @@ function SignupPage({ onLoginClick, registrationError, }: SignupPageProps) {
             />
           </label>
 
-          {(error || registrationError) && (
-  <p role="alert" className="form-error">
-    {error || registrationError}
-  </p>
-)}
+          {error && (
+            <p role="alert" className="form-error">
+              {error}
+            </p>
+          )}
 
-          <button type="submit">Register</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Registering..." : "Register"}
+          </button>
         </form>
 
         <p>
@@ -125,4 +156,3 @@ function SignupPage({ onLoginClick, registrationError, }: SignupPageProps) {
 }
 
 export default SignupPage;
-

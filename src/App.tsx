@@ -71,6 +71,7 @@ function App() {
     return (
       <SignupPage
         onLoginClick={() => navigate("login")}
+        onRegistered={() => navigate("check-email")}
       />
     );
   }

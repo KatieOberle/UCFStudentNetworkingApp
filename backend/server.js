@@ -18,19 +18,37 @@ client.connect();
 const authController = require('./controllers/authController');
 const authRoutes = require('./routes/authRoutes');
 
+// update routes for reporting
+const reportsController = require('./controllers/reportsController');
+const reportsRoutes = require('./routes/reportsRoutes');
 const profileController = require('./controllers/profileController');
 const profileRoutes = require('./routes/profileRoutes');
 
 const postController = require('./controllers/postController');
 const postRoutes = require('./routes/postRoutes');
 
+const commentController = require('./controllers/commentController');
+const commentRoutes = require('./routes/commentRoutes');
+
+const connectionController = require('./controllers/connectionController');
+const connectionRoutes = require('./routes/connectionRoutes');
+
 authController.setDatabase(client);
 profileController.setDatabase(client);
 postController.setDatabase(client);
+commentController.setDatabase(client);
+
+connectionController.setDatabase(client);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/post', postRoutes);
+app.use('/api/replies', commentRoutes);
+app.use('/api/connection', connectionRoutes);
+
+// update initializing database routes for reports
+reportsController.setDatabase(client);
+app.use('/api/reports', reportsRoutes);
 
 app.use((req, res, next) =>
 	{
