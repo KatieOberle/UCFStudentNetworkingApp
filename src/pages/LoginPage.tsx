@@ -27,19 +27,14 @@ function LoginPage({ onSignupClick, onLoginClick }: LoginPageProps) {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Login failed.");
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data || data.error || !data.accessToken) {
+        throw new Error(data?.error || "Login failed.");
       }
 
+      setToken(data.accessToken);
       onLoginClick();
-
-
-      const data = await response.json();
-    if (!response.ok || data.error || !data.accessToken) {
-      throw new Error(data.error || "Login failed.");
-    }
-
-    onLoginClick();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Login failed.");
     }
