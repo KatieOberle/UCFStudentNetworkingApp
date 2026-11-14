@@ -1,7 +1,11 @@
+// AI disclosure: Claude Sonnet 5.5 Medium used for AJAX debug
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const token = require("../createJWT.js");
+const {sendEmail} = require('../utils/mailer');
+
+const appUrl = () => (process.env.APP_URL || 'http://localhost:5173').replace(/\/+$/, '');
 
 let db;
 
@@ -93,13 +97,8 @@ exports.logout = async function (req, res)
 
 exports.register = async function (req, res, next)
 {
-	// incoming: login, password, email, firstName, lastName
-	// outgoing: error
-	
-	// Placeholder error variable
-	var error = '';
-
-	// Request body follows this key/value format
+	// incoming: password, email, firstName, lastName
+	// outgoing: message or error
 	const {password, email, firstName, lastName} = req.body;
 
 	if(!email || !password)
@@ -107,64 +106,64 @@ exports.register = async function (req, res, next)
 		return res.status(400).json({error: 'Email and password are required'});
 	}
 
-
 	const lowerEmail = email.toLowerCase();
 
-	// AI assisted code
-	const hashedPassword = await bcrypt.hash(password, 10);
-
-	// AI assisted code
-	const verifyToken = crypto.randomBytes(32).toString('hex');
-	const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-	// TODO: Add new UserId to this
+	if(lowerEmail.split('@').pop() !== 'ucf.edu')
+	{
+		return res.status(400).json({error: 'Email must be a UCF email'});
+	}
 
 	try
 	{
-		const dup = await db.collection('Users').find({Email:lowerEmail}).toArray();
+		const existing = await db.collection('Users').findOne({Email: lowerEmail});
 
-		if(dup.length > 0)
+		if(existing)
 		{
-			error = 'Email already registered';
+			return res.status(409).json({error: 'Email already registered'});
 		}
-		else
+
+		const hashedPassword = await bcrypt.hash(password, 10);
+		const verifyToken = crypto.randomBytes(32).toString('hex');
+		const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+		const lastUser = await db.collection('Users').find({}).sort({UserID: -1}).limit(1).next();
+		const userId = lastUser ? lastUser.UserID + 1 : 1;
+
+		await db.collection('Users').insertOne({
+			UserID: userId,
+			Password: hashedPassword,
+			Email: lowerEmail,
+			FirstName: firstName,
+			LastName: lastName,
+			EmailVerified: false,
+			VerifyToken: verifyToken,
+			VerifyExpires: verifyExpires
+		});
+
+		const verificationLink = `${appUrl()}/verify-email?token=${verifyToken}`;
+
+		try
 		{
-			const server = lowerEmail.split('@').pop();
-
-			if(server === "ucf.edu")
-			{
-				const lastUser = await db.collection('Users').find({}).sort({UserID: -1}).limit(1).next();
-				const userId = lastUser ? lastUser.UserID + 1 : 1;
-
-				const newUser = {
-					UserID: userId,
-					Password: hashedPassword,
-					Email: lowerEmail,
-					FirstName: firstName,
-					LastName: lastName,
-					EmailVerified: false,
-					VerifyToken: verifyToken,
-					VerifyExpires: verifyExpires
-				};
-				const result = await db.collection('Users').insertOne(newUser);
-
-				// AI assisted code
-				const verificationLink =`http://localhost:5000/api/auth/verify?token=${verifyToken}`;
-				console.log('Verification link:', verificationLink);
-			}
-			else
-			{
-				error = 'Email must be a UCF email';
-			}
+			await sendEmail({
+				to: lowerEmail,
+				subject: 'Verify your KnightLink email',
+				text: `Welcome to KnightLink! Verify your email: ${verificationLink}\nThis link expires in 24 hours.`,
+				html: `<p>Welcome to KnightLink!</p><p><a href="${verificationLink}">Verify your email</a></p><p>This link expires in 24 hours.</p>`
+			});
 		}
+		catch(mailError)
+		{
+			console.error('Verification email failed:', mailError);
+			return res.status(500).json({error: 'Account created, but the verification email could not be sent. Please try again later.'});
+		}
+
+		return res.status(201).json({message: 'Registration successful. Check your email to verify your account.'});
 	}
 	catch(e)
 	{
-		error = e.toString();
+		console.error('Register error:', e);
+		return res.status(500).json({error: 'Server error during registration'});
 	}
-
-	var ret = {error:error};
-	res.status(200).json(ret);
 };
 
 // AI assisted code
@@ -297,8 +296,22 @@ exports.forgotPassword = async function (req, res)
 			}
 		);
 
-		const resetLink =`http://localhost:5000/api/reset-password?token=${resetToken}`;
-		console.log('Password reset link:', resetLink);
+		const resetLink = `${appUrl()}/reset-password?token=${resetToken}`;
+
+		try
+		{
+			await sendEmail({
+				to: user.Email,
+				subject: 'Reset your KnightLink password',
+				text: `Reset your password: ${resetLink}\nThis link expires in 1 hour.`,
+				html: `<p><a href="${resetLink}">Reset your password</a></p><p>This link expires in 1 hour.</p>`
+			});
+		}
+		catch(mailError)
+		{
+			// Logged only; same generic response so account existence isn't leaked
+			console.error('Reset email failed:', mailError);
+		}
 
 		return res.status(200).json({message});
 	}
