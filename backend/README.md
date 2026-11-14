@@ -26,8 +26,17 @@ Node.js and Express REST API for the UCF Student Networking App. Uses MongoDB fo
 
    ```env
    MONGODB_URI=your_mongodb_connection_string
+   DB_NAME=your_database_name
    ACCESS_TOKEN_SECRET=your_secret_key
+   APP_URL=http://localhost:5173
+   SMTP_HOST=smtp.example.com
+   SMTP_PORT=587
+   SMTP_USER=your_smtp_user
+   SMTP_PASS=your_smtp_password
+   MAIL_FROM="KnightLink <no-reply@example.com>"
    ```
+
+   `APP_URL` is the public frontend URL used in email links (`${APP_URL}/verify-email?token=...`, `${APP_URL}/reset-password?token=...`). If `SMTP_HOST`, `SMTP_USER` or `SMTP_PASS` is missing, emails are printed to the console instead of sent. To use SendGrid: `SMTP_HOST=smtp.sendgrid.net`, `SMTP_PORT=587`, `SMTP_USER=apikey`, `SMTP_PASS=<SendGrid API key>`.
 
 4. Start the development server:
 
@@ -61,7 +70,7 @@ Authorization: Bearer <access_token>
 
 * Passwords are hashed using `bcryptjs`.
 * JWTs are signed using `ACCESS_TOKEN_SECRET`.
-* Email verification and password reset links are printed in the backend terminal for local development.
+* Verification and password reset emails are sent through SMTP; without SMTP settings they are printed in the backend terminal for local development.
 * New users receive an automatically generated integer `UserID`.
 * Never commit `.env` files or expose database credentials or JWT secrets.
 
@@ -70,4 +79,3 @@ Authorization: Bearer <access_token>
 Use Postman to test registration, login, email verification, password recovery, and authenticated requests.
 
 This project is intended for academic development and demonstration, not production deployment.
-
