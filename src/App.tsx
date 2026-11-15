@@ -11,7 +11,6 @@ import ReportUserPage from "./pages/ReportUserPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProfilePage from "./pages/ProfilePage";
-import CommunitiesPage from "./pages/CommunitiesPage";
 import DiscussionsPage from "./pages/DiscussionsPage";
 import HomePage from "./pages/HomePage";
 import CheckEmailPage from "./pages/CheckEmailPage";
@@ -107,11 +106,17 @@ function App() {
 
   async function searchStudentProfiles(query: string): Promise<Student[]> {
     const result = await searchStudents(query);
-    return result.users.map((user) => ({
-      id: String(user.userId), firstName: user.firstName, lastName: user.lastName,
-      major: user.major, graduationYear: user.graduationYear ?? undefined,
-      careerInterests: user.careerInterests, companies: user.companies, bio: user.bio,
-    }));
+    const users = Array.isArray(result?.users) ? result.users : [];
+    return users
+      .filter((user) => user && Number.isSafeInteger(Number(user.userId)) && Number(user.userId) > 0)
+      .map((user) => ({
+        id: String(user.userId),
+        firstName: typeof user.firstName === "string" ? user.firstName : "",
+        lastName: typeof user.lastName === "string" ? user.lastName : "",
+        major: typeof user.major === "string" ? user.major : "",
+        careerInterests: Array.isArray(user.careerInterests) ? user.careerInterests.filter((value): value is string => typeof value === "string") : [],
+        companies: Array.isArray(user.companies) ? user.companies.filter((value): value is string => typeof value === "string") : [],
+      }));
   }
 
   async function connectStudent(studentId: string) {
@@ -181,9 +186,7 @@ function App() {
     return (
       <HomePage
         onDiscussionsClick={() => navigate("discussions")}
-        onSearchClick={() => navigate("search")}
-        onCommunitiesClick={() => navigate("communities")}
-        onProfileClick={() => navigate("profile")}
+        onSearchClick={() => navigate("search")}        onProfileClick={() => navigate("profile")}
         onCreateThreadClick={() => navigate("create-thread")}
         onLogoutClick={handleLogout}
         logoutError={logoutError}
@@ -195,9 +198,7 @@ function App() {
     return (
       <SearchPage
         onHomeClick={() => navigate("home")}
-        onDiscussionsClick={() => navigate("discussions")}
-        onCommunitiesClick={() => navigate("communities")}
-        onProfileClick={() => navigate("profile")}
+        onDiscussionsClick={() => navigate("discussions")}        onProfileClick={() => navigate("profile")}
         onStudentClick={openStudent}
         onSearchStudents={searchStudentProfiles}
       />
@@ -230,9 +231,7 @@ function App() {
       <ProfilePage
         onHomeClick={() => navigate("home")}
         onDiscussionsClick={() => navigate("discussions")}
-        onSearchClick={() => navigate("search")}
-        onCommunitiesClick={() => navigate("communities")}
-        onConnectionsClick={() => navigate("connections")}
+        onSearchClick={() => navigate("search")}        onConnectionsClick={() => navigate("connections")}
         onEditProfileClick={() => navigate("edit-profile")}
         onLogoutClick={handleLogout}
         logoutError={logoutError}
@@ -240,24 +239,12 @@ function App() {
     );
   }
 
-  if (page === "communities") {
-    return (
-      <CommunitiesPage
-        onHomeClick={() => navigate("home")}
-        onDiscussionsClick={() => navigate("discussions")}
-        onSearchClick={() => navigate("search")}
-        onProfileClick={() => navigate("profile")}
-      />
-    );
-  }
 
   if (page === "discussions") {
     return (
       <DiscussionsPage
         onHomeClick={() => navigate("home")}
-        onSearchClick={() => navigate("search")}
-        onCommunitiesClick={() => navigate("communities")}
-        onProfileClick={() => navigate("profile")}
+        onSearchClick={() => navigate("search")}        onProfileClick={() => navigate("profile")}
         onCreateThreadClick={() => navigate("create-thread")}
         onThreadClick={openThread}
         threads={threads}

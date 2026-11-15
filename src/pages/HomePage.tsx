@@ -2,7 +2,6 @@
 interface HomePageProps {
   onDiscussionsClick: () => void;
   onSearchClick: () => void;
-  onCommunitiesClick: () => void;
   onProfileClick: () => void;
   onCreateThreadClick: () => void;
   onLogoutClick: () => void;
@@ -12,7 +11,6 @@ interface HomePageProps {
 function HomePage({
   onDiscussionsClick,
   onSearchClick,
-  onCommunitiesClick,
   onProfileClick,
   onCreateThreadClick,
   onLogoutClick,
@@ -40,10 +38,6 @@ function HomePage({
             Search
           </button>
 
-          <button type="button" onClick={onCommunitiesClick}>
-            Communities
-          </button>
-
           <button type="button" onClick={onProfileClick}>
             Profile
           </button>
@@ -69,7 +63,7 @@ function HomePage({
           <h2>Welcome to KnightLink</h2>
           <p>
             Connect with UCF students, join discussions,
-            discover communities, and grow your network.
+            and grow your network.
           </p>
         </section>
 
