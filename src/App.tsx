@@ -91,9 +91,14 @@ function App() {
 
   const [logoutError, setLogoutError] = useState("");
 
-  // These collections will be filled by the backend integration.
-  const [threads] = useState<Thread[]>([]);
-  const [replies] = useState<ThreadReply[]>([]);
+  // Data loaded from the backend.
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [requests, setRequests] = useState<PendingRequest[]>([]);
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [replies, setReplies] = useState<ThreadReply[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [repliesError, setRepliesError] = useState("");
 
   function navigate(destination: string) {
     setLogoutError("");
