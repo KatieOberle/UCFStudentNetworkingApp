@@ -1,5 +1,6 @@
 
 import { useState, type FormEvent } from "react";
+import { createPost } from "../services/api";
 
 interface Community {
   id: string;
@@ -36,23 +37,35 @@ function CreateThreadPage({
       return;
     }
 
-    if (!onCreateThread) {
-      setError("Thread publishing is not connected to the server yet.");
+    if (!localStorage.getItem("token")) {
+      setError("Please log in before creating a thread.");
       return;
     }
 
     setSubmitting(true);
 
     try {
-      await onCreateThread({
-        title: title.trim(),
-        body: body.trim(),
-        communityId: communityId || undefined,
-      });
+      if (onCreateThread) {
+        await onCreateThread({
+          title: title.trim(),
+          body: body.trim(),
+          communityId: communityId || undefined,
+        });
+      } else {
+        await createPost(
+          title.trim(),
+          body.trim(),
+          []
+        );
+      }
 
       onBackClick();
-    } catch {
-      setError("Unable to publish your thread. Please try again.");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to publish your thread. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -80,7 +93,10 @@ function CreateThreadPage({
         </section>
 
         <section className="discussion-section">
-          <form className="create-thread-form" onSubmit={handleSubmit}>
+          <form
+            className="create-thread-form"
+            onSubmit={handleSubmit}
+          >
             <label>
               Thread Title
               <input
@@ -108,12 +124,19 @@ function CreateThreadPage({
               Community (Optional)
               <select
                 value={communityId}
-                onChange={(event) => setCommunityId(event.target.value)}
+                onChange={(event) =>
+                  setCommunityId(event.target.value)
+                }
               >
-                <option value="">General discussion</option>
+                <option value="">
+                  General discussion
+                </option>
 
                 {communities.map((community) => (
-                  <option key={community.id} value={community.id}>
+                  <option
+                    key={community.id}
+                    value={community.id}
+                  >
                     {community.name}
                   </option>
                 ))}
@@ -135,8 +158,13 @@ function CreateThreadPage({
                 Cancel
               </button>
 
-              <button type="submit" disabled={submitting}>
-                {submitting ? "Publishing..." : "Create Thread"}
+              <button
+                type="submit"
+                disabled={submitting}
+              >
+                {submitting
+                  ? "Publishing..."
+                  : "Create Thread"}
               </button>
             </div>
           </form>

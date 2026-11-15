@@ -1,4 +1,6 @@
-
+import {useEffect, useState} from "react";
+import {getProfile, getLoggedInUserId, getUserPosts} from "../services/api";
+import type {StudentProfile} from "../services/api";
 interface ProfilePageProps {
   onHomeClick: () => void;
   onDiscussionsClick: () => void;
@@ -20,6 +22,23 @@ function ProfilePage({
   onLogoutClick,
   logoutError,
 }: ProfilePageProps) {
+  const [user, setUser] = useState<StudentProfile | null>(null);
+  const [threadCount, setThreadCount] = useState<number | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const id = getLoggedInUserId();
+    if (!id) { setError("Please log in to view your profile."); return; }
+    let active = true;
+    Promise.all([getProfile(id), getUserPosts(id)]).then(([profile, posts]) => {
+      if (!active) return;
+      setUser(profile.user);
+      setThreadCount(posts.posts.length);
+    }).catch((err: unknown) => {
+      if (active) setError(err instanceof Error ? err.message : "Unable to load profile.");
+    });
+    return () => { active = false; };
+  }, []);
+  const contactInfo = user?.contact && typeof user.contact.info === "string" ? user.contact.info : "Not provided";
   return (
     <div className="home-page">
       <header className="top-nav">
@@ -67,6 +86,7 @@ function ProfilePage({
           </p>
         )}
 
+        {error && <p role="alert" className="form-error">{error}</p>}
         <section className="profile-header">
           <div>
             <h2>My Profile</h2>
@@ -96,32 +116,32 @@ function ProfilePage({
         <section className="profile-grid">
           <div className="profile-card">
             <h3>Name</h3>
-            <p>Your name will appear here.</p>
+            <p>{user ? `${user.firstName} ${user.lastName}` : "Loading..."}</p>
           </div>
 
           <div className="profile-card">
             <h3>Major</h3>
-            <p>Your major will appear here.</p>
+            <p>{user?.major || "Not provided"}</p>
           </div>
 
           <div className="profile-card">
             <h3>Career Interests</h3>
-            <p>Your career interests will appear here.</p>
+            <p>{user?.careerInterests?.join(", ") || "Not provided"}</p>
           </div>
 
           <div className="profile-card">
             <h3>Company Affiliations</h3>
-            <p>Your company affiliations will appear here.</p>
+            <p>{user?.companies?.join(", ") || "Not provided"}</p>
           </div>
 
           <div className="profile-card">
             <h3>Contact Information</h3>
-            <p>Your contact information will appear here.</p>
+            <p>{contactInfo}</p>
           </div>
 
           <div className="profile-card">
             <h3>My Discussions</h3>
-            <p>Your discussion threads will appear here.</p>
+            <p>{threadCount === null ? "Loading..." : `${threadCount} thread(s)`}</p>
           </div>
         </section>
       </main>

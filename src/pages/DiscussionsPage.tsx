@@ -1,6 +1,7 @@
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { Thread } from "./ThreadDetailPage";
+import { getUserPosts } from "../services/api";
 
 interface DiscussionsPageProps {
   onHomeClick: () => void;
@@ -10,6 +11,30 @@ interface DiscussionsPageProps {
   onCreateThreadClick: () => void;
   onThreadClick: (thread: Thread) => void;
   threads?: Thread[];
+}
+
+function getLoggedInUserId(): number | null {
+  const token = localStorage.getItem("token");
+
+  if (!token) return null;
+
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const base64 = parts[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+    const payload = JSON.parse(atob(base64));
+    const userId = Number(payload.userId);
+
+    return Number.isSafeInteger(userId) && userId > 0
+      ? userId
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 function DiscussionsPage({
@@ -23,13 +48,72 @@ function DiscussionsPage({
 }: DiscussionsPageProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
+  const [myThreads, setMyThreads] = useState<Thread[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadThreads() {
+      const userId = getLoggedInUserId();
+
+      if (!userId) {
+        if (!cancelled) {
+          setError("Please log in to view your discussions.");
+          setLoading(false);
+        }
+        return;
+      }
+
+      try {
+        const response = await getUserPosts(userId);
+
+        if (cancelled) return;
+
+        const loadedThreads = response.posts.map((post) => ({
+          id: String(post.PostID),
+          title: post.Title,
+          body: post.Body,
+          authorName: "You",
+          createdAt: "",
+        })) as Thread[];
+
+        setMyThreads(loadedThreads);
+        setError("");
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Unable to load discussions."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadThreads();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmittedSearch(searchTerm.trim());
   }
 
-  const visibleThreads = threads.filter((thread) => {
+  const allThreads = [...myThreads, ...threads].filter(
+    (thread, index, array) =>
+      array.findIndex((item) => item.id === thread.id) === index
+  );
+
+  const visibleThreads = allThreads.filter((thread) => {
     const query = submittedSearch.toLowerCase();
 
     return (
@@ -76,8 +160,8 @@ function DiscussionsPage({
           <div>
             <h2>Discussions</h2>
             <p>
-              Search existing threads, join conversations,
-              or start your own.
+              View your threads, search discussions,
+              or start a new conversation.
             </p>
           </div>
 
@@ -99,7 +183,17 @@ function DiscussionsPage({
             <button type="submit">Search</button>
           </form>
 
-          {visibleThreads.length === 0 ? (
+          {error && (
+            <p role="alert" className="form-error">
+              {error}
+            </p>
+          )}
+
+          {loading ? (
+            <div className="empty-state">
+              <p>Loading discussions...</p>
+            </div>
+          ) : visibleThreads.length === 0 ? (
             <div className="empty-state">
               <p>
                 {submittedSearch
@@ -143,3 +237,4 @@ function DiscussionsPage({
 }
 
 export default DiscussionsPage;
+
