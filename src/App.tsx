@@ -1,5 +1,8 @@
-
 import { useState } from "react";
+import {
+  searchStudents, sendConnectionRequest, getPostComments, addComment, deleteComment,
+  deletePost, submitReport, getLoggedInUserId, logout
+} from "./services/api";
 
 import SearchPage from "./pages/SearchPage";
 import type { Student } from "./pages/SearchPage";
@@ -14,6 +17,7 @@ import HomePage from "./pages/HomePage";
 import CheckEmailPage from "./pages/CheckEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ConnectionsPage from "./pages/ConnectionsPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import CreateThreadPage from "./pages/CreateThreadPage";
@@ -28,9 +32,8 @@ function App() {
   const [page, setPage] = useState(() => {
     const path = window.location.pathname;
 
-    if (path === "/reset-password") {
-      return "reset-password";
-    }
+    if (path === "/reset-password") return "reset-password";
+    if (path === "/verify-email") return "verify-email";
 
     return "login";
   });
@@ -45,7 +48,8 @@ function App() {
 
   // These collections will be filled by backend integration.
   const [threads] = useState<Thread[]>([]);
-  const [replies] = useState<ThreadReply[]>([]);
+  const [replies, setReplies] = useState<ThreadReply[]>([]);
+  const [threadError, setThreadError] = useState("");
 
   function navigate(destination: string) {
     setLogoutError("");
@@ -62,9 +66,62 @@ function App() {
     setPage(destination);
   }
 
-  function openThread(thread: Thread) {
+  async function refreshReplies(postId: number) {
+    const response = await getPostComments(postId);
+    const me = getLoggedInUserId();
+    setReplies(response.comments.map((comment) => ({
+      id: String(comment.ReplyID),
+      body: comment.Body,
+      authorName: comment.AuthorId === me ? "You" : `Student #${comment.AuthorId}`,
+      createdAt: comment.CreatedAt ? new Date(comment.CreatedAt).toLocaleString() : "",
+      isOwnReply: comment.AuthorId === me,
+    })));
+  }
+
+  async function openThread(thread: Thread) {
     setSelectedThread(thread);
+    setReplies([]);
+    setThreadError("");
     navigate("thread-detail");
+    try { await refreshReplies(Number(thread.id)); }
+    catch (error) {
+      setThreadError(error instanceof Error ? error.message : "Unable to load replies.");
+    }
+  }
+
+  async function sendReply(body: string) {
+    if (!selectedThread) throw new Error("No thread selected");
+    const postId = Number(selectedThread.id);
+    await addComment(postId, body);
+    await refreshReplies(postId);
+  }
+
+  async function removeReply(replyId: string) {
+    await deleteComment(Number(replyId));
+    if (selectedThread) await refreshReplies(Number(selectedThread.id));
+  }
+
+  async function removeThread(threadId: string) {
+    await deletePost(Number(threadId));
+  }
+
+  async function searchStudentProfiles(query: string): Promise<Student[]> {
+    const result = await searchStudents(query);
+    return result.users.map((user) => ({
+      id: String(user.userId), firstName: user.firstName, lastName: user.lastName,
+      major: user.major, graduationYear: user.graduationYear ?? undefined,
+      careerInterests: user.careerInterests, companies: user.companies, bio: user.bio,
+    }));
+  }
+
+  async function connectStudent(studentId: string) {
+    await sendConnectionRequest(Number(studentId));
+  }
+
+  async function reportStudent(report: {reportedUserId: string; reason: string; details: string}) {
+    // Backend's reason key is intentionally spelled "innappropriate_content".
+    const reason = report.reason === "inappropriate" ? "innappropriate_content" : report.reason;
+    await submitReport(Number(report.reportedUserId), reason, report.details.slice(0, 1000));
   }
 
   function openStudent(student: Student) {
@@ -77,11 +134,14 @@ function App() {
     navigate("report-user");
   }
 
-  function handleLogout() {
-    // Real logout API integration is still pending.
-    setLogoutError(
-      "Logout is not connected to authentication yet."
-    );
+  async function handleLogout() {
+    try { await logout(); } catch { /* Client token still needs to be cleared. */ }
+    localStorage.removeItem("token");
+    navigate("login");
+  }
+
+  if (page === "verify-email") {
+    return <VerifyEmailPage onLoginClick={() => navigate("login")} />;
   }
 
   if (page === "signup") {
@@ -139,6 +199,7 @@ function App() {
         onCommunitiesClick={() => navigate("communities")}
         onProfileClick={() => navigate("profile")}
         onStudentClick={openStudent}
+        onSearchStudents={searchStudentProfiles}
       />
     );
   }
@@ -149,6 +210,7 @@ function App() {
         student={selectedStudent}
         onBackClick={() => navigate("search")}
         onReportClick={openReportPage}
+        onConnect={connectStudent}
       />
     );
   }
@@ -158,6 +220,7 @@ function App() {
       <ReportUserPage
         student={selectedStudent}
         onBackClick={() => navigate("student-profile")}
+        onSubmitReport={reportStudent}
       />
     );
   }
@@ -204,14 +267,21 @@ function App() {
 
   if (page === "thread-detail") {
     return (
+      <>
+      {threadError && <p role="alert" className="form-error">{threadError}</p>}
       <ThreadDetailPage
         thread={selectedThread}
         replies={replies}
+        onSubmitReply={sendReply}
+        onDeleteReply={removeReply}
+        onDeleteThread={removeThread}
         onBackClick={() => {
+          setThreadError("");
           setSelectedThread(null);
           navigate("discussions");
         }}
       />
+      </>
     );
   }
 
@@ -249,4 +319,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,4 +1,3 @@
-
 import { useState, type FormEvent } from "react";
 import type { Student } from "./SearchPage";
 
@@ -142,7 +141,7 @@ function ReportUserPage({
                   }
                   placeholder="Describe what happened..."
                   rows={6}
-                  maxLength={2000}
+                  maxLength={1000}
                   required
                 />
 
