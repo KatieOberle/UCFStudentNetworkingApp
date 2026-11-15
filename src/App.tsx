@@ -34,6 +34,12 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ConnectionsPage from "./pages/ConnectionsPage";
 import EditProfilePage from "./pages/EditProfilePage";
+
+import type 
+{ 
+  ProfileData 
+} from "./pages/EditProfilePage";
+
 import CreateThreadPage from "./pages/CreateThreadPage";
 import ThreadDetailPage from "./pages/ThreadDetailPage";
 
@@ -41,6 +47,38 @@ import type {
   Thread,
   ThreadReply,
 } from "./pages/ThreadDetailPage";
+
+// new helpers for App() function, AI assisted Claude Sonnet v5.5
+const splitList = (value: string): string[] =>
+  value
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+
+const fullName = (profile: UserProfile): string =>
+  `${profile.firstName} ${profile.lastName}`.trim();
+
+function toThread(post: Post, profile: UserProfile): Thread {
+  return {
+    id: String(post.PostID),
+    title: post.Title,
+    body: post.Body,
+    authorName: fullName(profile),
+    isOwnThread: post.AuthorId === profile.userId,
+  };
+}
+
+function toReply(reply: Reply, profile: UserProfile): ThreadReply {
+  const isOwn = reply.AuthorId === profile.userId;
+
+  return {
+    id: String(reply.ReplyID),
+    body: reply.Body,
+    authorName: isOwn ? fullName(profile) : `Student #${reply.AuthorId}`,
+    createdAt: new Date(reply.CreatedAt).toLocaleString(),
+    isOwnReply: isOwn,
+  };
+}
 
 function App() {
   const [page, setPage] = useState("login");
