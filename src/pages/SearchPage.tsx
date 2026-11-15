@@ -17,7 +17,6 @@ export interface Student {
 interface SearchPageProps {
   onHomeClick: () => void;
   onDiscussionsClick: () => void;
-  onCommunitiesClick: () => void;
   onProfileClick: () => void;
   onStudentClick: (student: Student) => void;
   onSearchStudents?: (query: string) => Promise<Student[]>;
@@ -26,7 +25,6 @@ interface SearchPageProps {
 function SearchPage({
   onHomeClick,
   onDiscussionsClick,
-  onCommunitiesClick,
   onProfileClick,
   onStudentClick,
   onSearchStudents,
@@ -94,10 +92,6 @@ function SearchPage({
             Search
           </button>
 
-          <button type="button" onClick={onCommunitiesClick}>
-            Communities
-          </button>
-
           <button type="button" onClick={onProfileClick}>
             Profile
           </button>
@@ -162,8 +156,8 @@ function SearchPage({
                       className="student-avatar"
                       aria-hidden="true"
                     >
-                      {student.firstName.charAt(0)}
-                      {student.lastName.charAt(0)}
+                      {(student.firstName || "?").charAt(0)}
+                      {(student.lastName || "").charAt(0)}
                     </div>
 
                     <h3>

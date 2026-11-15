@@ -5,7 +5,6 @@ interface ProfilePageProps {
   onHomeClick: () => void;
   onDiscussionsClick: () => void;
   onSearchClick: () => void;
-  onCommunitiesClick: () => void;
   onConnectionsClick: () => void;
   onEditProfileClick: () => void;
   onLogoutClick: () => void;
@@ -16,7 +15,6 @@ function ProfilePage({
   onHomeClick,
   onDiscussionsClick,
   onSearchClick,
-  onCommunitiesClick,
   onConnectionsClick,
   onEditProfileClick,
   onLogoutClick,
@@ -55,10 +53,6 @@ function ProfilePage({
 
           <button type="button" onClick={onSearchClick}>
             Search
-          </button>
-
-          <button type="button" onClick={onCommunitiesClick}>
-            Communities
           </button>
 
           <button

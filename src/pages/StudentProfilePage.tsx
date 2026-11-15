@@ -119,13 +119,6 @@ function StudentProfilePage({
               </div>
 
               <div className="profile-card">
-                <h3>Graduation Year</h3>
-                <p>
-                  {student.graduationYear || "Not provided"}
-                </p>
-              </div>
-
-              <div className="profile-card">
                 <h3>Career Interests</h3>
                 <p>
                   {student.careerInterests?.length
@@ -141,11 +134,6 @@ function StudentProfilePage({
                     ? student.companies.join(", ")
                     : "Not provided"}
                 </p>
-              </div>
-
-              <div className="profile-card">
-                <h3>About</h3>
-                <p>{student.bio || "No bio provided."}</p>
               </div>
 
               <div className="profile-card">

@@ -6,7 +6,6 @@ import { getUserPosts } from "../services/api";
 interface DiscussionsPageProps {
   onHomeClick: () => void;
   onSearchClick: () => void;
-  onCommunitiesClick: () => void;
   onProfileClick: () => void;
   onCreateThreadClick: () => void;
   onThreadClick: (thread: Thread) => void;
@@ -40,7 +39,6 @@ function getLoggedInUserId(): number | null {
 function DiscussionsPage({
   onHomeClick,
   onSearchClick,
-  onCommunitiesClick,
   onProfileClick,
   onCreateThreadClick,
   onThreadClick,
@@ -143,10 +141,6 @@ function DiscussionsPage({
 
           <button type="button" onClick={onSearchClick}>
             Search
-          </button>
-
-          <button type="button" onClick={onCommunitiesClick}>
-            Communities
           </button>
 
           <button type="button" onClick={onProfileClick}>

@@ -5,7 +5,7 @@ import {
 } from "../services/api";
 
 interface ConnectionsPageProps { onBackClick: () => void; }
-type ConnectionTab = "connections" | "pending" | "sent";
+type ConnectionTab = "connections" | "pending";
 type Person = {userId: number; name: string; major: string};
 
 export default function ConnectionsPage({onBackClick}: ConnectionsPageProps) {
@@ -74,18 +74,16 @@ export default function ConnectionsPage({onBackClick}: ConnectionsPageProps) {
       </section>
       <section className="discussion-section">
         <div className="connection-tabs" role="group" aria-label="Connection categories">
-          {(["connections", "pending", "sent"] as ConnectionTab[]).map((tab) => (
+          {(["connections", "pending"] as ConnectionTab[]).map((tab) => (
             <button key={tab} type="button" className={activeTab === tab ? "active-tab" : ""}
               aria-pressed={activeTab === tab} onClick={() => setActiveTab(tab)}>
-              {tab === "connections" ? "My Connections" : tab === "pending" ? "Pending Requests" : "Sent Requests"}
+              {tab === "connections" ? "My Connections" : "Pending Requests"}
             </button>
           ))}
         </div>
         {error && <p role="alert" className="form-error">{error}</p>}
         {message && <p role="status" className="form-success">{message}</p>}
-        {loading ? <p>Loading network...</p> : activeTab === "sent" ? (
-          <div className="empty-state"><p>Sent requests are not available from the current backend API.</p></div>
-        ) : (activeTab === "connections" ? people : pending).length === 0 ? (
+        {loading ? <p>Loading network...</p> : (activeTab === "connections" ? people : pending).length === 0 ? (
           <div className="empty-state"><p>{activeTab === "connections" ? "No connections yet." : "No pending requests."}</p></div>
         ) : <div className="student-results">
           {(activeTab === "connections" ? people : pending).map((person) => <article className="student-result-card" key={person.userId}>
