@@ -424,3 +424,39 @@ exports.resetPassword = async function (req, res)
 		});
 	}
 };
+
+
+exports.debugDeleteAccount = async function (req, res)
+{
+    try
+    {
+        const { email } = req.body;
+
+        if (!email)
+        {
+            return res.status(400).json({ error: 'Email is required' });
+        }
+
+        const result = await db.collection('Users').deleteOne({
+            Email: email.toLowerCase()
+        });
+
+        if (result.deletedCount === 0)
+        {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        return res.status(200).json({
+            message: 'Account successfully deleted'
+        });
+    }
+    catch (error)
+    {
+        console.error('Account deletion error:', error);
+
+        return res.status(500).json({
+            error: 'Server error deleting account'
+        });
+    }
+};
+
