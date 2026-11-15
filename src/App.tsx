@@ -1,5 +1,23 @@
+// updated imports with repect to api.ts
+import { useEffect, useState } from "react";
 
-import { useState } from "react";
+import {
+  createPost,
+  createReply,
+  deletePost,
+  deleteReply,
+  fetchMyProfile,
+  fetchPendingRequests,
+  fetchReplies,
+  fetchUserPosts,
+  saveProfile,
+} from "./api";
+import type {
+  PendingRequest,
+  Post,
+  Reply,
+  UserProfile,
+} from "./api";
 
 import SearchPage from "./pages/SearchPage";
 import type { Student } from "./pages/SearchPage";
