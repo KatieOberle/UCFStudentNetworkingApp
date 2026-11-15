@@ -10,19 +10,56 @@ function ForgotPasswordPage({
 }: ForgotPasswordPageProps) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!/^[^\s@]+@ucf\.edu$/i.test(email.trim())) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!/^[^\s@]+@ucf\.edu$/i.test(normalizedEmail)) {
+      setIsError(true);
       setMessage("Please enter a valid @ucf.edu email address.");
       return;
     }
 
-    // Password reset API will be connected here.
-    setMessage(
-      "Password reset is not connected to the server yet."
-    );
+    setMessage("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: normalizedEmail,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Unable to request password reset."
+        );
+      }
+
+      setIsError(false);
+      setMessage(
+        "If an account exists for that email, a password reset link has been sent. Check your inbox."
+      );
+    } catch (error) {
+      setIsError(true);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -50,13 +87,18 @@ function ForgotPasswordPage({
           </label>
 
           {message && (
-            <p role="status" className="form-error">
+            <p
+              role={isError ? "alert" : "status"}
+              className={isError ? "form-error" : undefined}
+            >
               {message}
             </p>
           )}
 
-          <button type="submit">
-            Request Password Reset
+          <button type="submit" disabled={isLoading}>
+            {isLoading
+              ? "Sending Request..."
+              : "Request Password Reset"}
           </button>
         </form>
 

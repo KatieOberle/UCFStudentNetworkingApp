@@ -25,7 +25,15 @@ import type {
 } from "./pages/ThreadDetailPage";
 
 function App() {
-  const [page, setPage] = useState("login");
+  const [page, setPage] = useState(() => {
+    const path = window.location.pathname;
+
+    if (path === "/reset-password") {
+      return "reset-password";
+    }
+
+    return "login";
+  });
 
   const [selectedStudent, setSelectedStudent] =
     useState<Student | null>(null);
@@ -35,12 +43,22 @@ function App() {
 
   const [logoutError, setLogoutError] = useState("");
 
-  // These collections will be filled by the backend integration.
+  // These collections will be filled by backend integration.
   const [threads] = useState<Thread[]>([]);
   const [replies] = useState<ThreadReply[]>([]);
 
   function navigate(destination: string) {
     setLogoutError("");
+
+    // Preserve the reset token while the reset page is open.
+    // Remove it from the URL when leaving that page.
+    if (
+      window.location.pathname !== "/" ||
+      window.location.search
+    ) {
+      window.history.replaceState({}, "", "/");
+    }
+
     setPage(destination);
   }
 
@@ -60,8 +78,7 @@ function App() {
   }
 
   function handleLogout() {
-    // Do not navigate away while the real auth session is active.
-    // Kenny can replace this with the team's logout implementation.
+    // Real logout API integration is still pending.
     setLogoutError(
       "Logout is not connected to authentication yet."
     );
@@ -232,3 +249,4 @@ function App() {
 }
 
 export default App;
+
