@@ -116,3 +116,10 @@ export function verifyEmail(token: string) {
 export function logout() {
   return apiRequest<{message: string}>("/auth/logout", {method: "POST"});
 }
+
+export interface FeedPost extends Post {
+  authorName: string;
+}
+export function getRecentPosts() {
+  return apiRequest<{ posts: FeedPost[] }>("/post/recent");
+}
