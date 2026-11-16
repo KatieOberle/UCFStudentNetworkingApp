@@ -123,3 +123,10 @@ export interface FeedPost extends Post {
 export function getRecentPosts() {
   return apiRequest<{ posts: FeedPost[] }>("/post/recent");
 }
+
+// Separate from submitReport(), which reports a user's account.
+export function submitDiscussionReport(postId: number, reason: string) {
+  return apiRequest<{message: string; reportCount: number; hidden: boolean}>(
+    `/post/${postId}/report`, {method: "POST", body: {reason}}
+  );
+}

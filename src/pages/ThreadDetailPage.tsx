@@ -24,6 +24,7 @@ interface ThreadDetailPageProps {
   onBackClick: () => void;
   onSubmitReply?: (body: string) => Promise<void>;
   onDeleteThread?: (threadId: string) => Promise<void>;
+  onReportThread?: (threadId: string, reason: string) => Promise<{message: string; reportCount: number; hidden: boolean}>;
   onDeleteReply?: (replyId: string) => Promise<void>;
 }
 
@@ -33,12 +34,16 @@ function ThreadDetailPage({
   onBackClick,
   onSubmitReply,
   onDeleteThread,
+  onReportThread,
   onDeleteReply,
 }: ThreadDetailPageProps) {
   const [replyText, setReplyText] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [reportReason, setReportReason] = useState("spam");
+  const [reporting, setReporting] = useState(false);
+  const [reportStatus, setReportStatus] = useState("");
 
   async function handleSubmitReply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -86,6 +91,23 @@ function ThreadDetailPage({
       setError("Unable to delete this thread.");
     } finally {
       setDeletingId(null);
+    }
+  }
+
+  async function handleReportThread() {
+    if (!thread || !onReportThread) return;
+    if (!window.confirm("Submit a report for this discussion?")) return;
+    setReporting(true);
+    setError("");
+    setReportStatus("");
+    try {
+      const response = await onReportThread(thread.id, reportReason);
+      setReportStatus(response.message);
+      if (response.hidden) onBackClick();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to report discussion.");
+    } finally {
+      setReporting(false);
     }
   }
 
@@ -162,6 +184,27 @@ function ThreadDetailPage({
               </div>
 
               <p className="thread-body">{thread.body}</p>
+              {!thread.isOwnThread && onReportThread && (
+                <div className="thread-report-controls">
+                  <label htmlFor="discussion-report-reason">Report reason: </label>
+                  <select
+                    id="discussion-report-reason"
+                    value={reportReason}
+                    onChange={(event) => setReportReason(event.target.value)}
+                    disabled={reporting}
+                  >
+                    <option value="spam">Spam</option>
+                    <option value="harassment">Harassment</option>
+                    <option value="innappropriate_content">Inappropriate Content</option>
+                    <option value="other">Other</option>
+                  </select>{" "}
+                  <button type="button" onClick={handleReportThread} disabled={reporting || !!reportStatus}>
+                    {reporting ? "Reporting..." : reportStatus ? "Reported" : "Report Discussion"}
+                  </button>
+                  {reportStatus && <p role="status">{reportStatus}</p>}
+                  {error && <p role="alert" className="form-error">{error}</p>}
+                </div>
+              )}
             </article>
 
             <section className="thread-replies-section">

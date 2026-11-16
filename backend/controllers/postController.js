@@ -57,7 +57,7 @@ exports.getUserPosts = async function (req, res)
 
 		const posts = await db.collection('Posts')
 			.find(
-				{AuthorId: userId},
+				{AuthorId: userId, Hidden: {$ne: true}},
 				{
 					projection: {
 						_id: 0,
@@ -237,6 +237,7 @@ exports.deletePost = async function (req, res)
 exports.getRecentPosts = async function (req, res) {
   try {
     const posts = await db.collection('Posts').aggregate([
+      { $match: { Hidden: { $ne: true } } },
       { $sort: { PostID: -1 } },
       { $limit: 100 },
       { $lookup: {
@@ -259,5 +260,64 @@ exports.getRecentPosts = async function (req, res) {
   } catch (error) {
     console.error('Error retrieving recent posts:', error);
     return res.status(500).json({error: 'Server error retrieving recent posts'});
+  }
+};
+
+
+// Discussion reports are stored separately from user reports.
+// Three unique authenticated reporters hide a post; no post is permanently deleted.
+exports.reportPost = async function (req, res) {
+  try {
+    const postId = Number(req.params.postId);
+    const reporterId = Number(req.user && req.user.userId);
+    const validReasons = ['spam', 'harassment', 'innappropriate_content', 'other'];
+    const reason = req.body && req.body.reason;
+    if (!Number.isSafeInteger(postId) || postId <= 0) {
+      return res.status(400).json({error: 'Invalid post ID'});
+    }
+    if (!Number.isSafeInteger(reporterId) || reporterId <= 0) {
+      return res.status(401).json({error: 'Invalid account'});
+    }
+    if (!validReasons.includes(reason)) {
+      return res.status(400).json({error: 'Choose a valid report reason'});
+    }
+
+    const posts = db.collection('Posts');
+    const post = await posts.findOne({PostID: postId});
+    if (!post) return res.status(404).json({error: 'Discussion not found'});
+    if (post.Hidden === true) {
+      return res.status(409).json({error: 'This discussion is no longer available'});
+    }
+    if (Number(post.AuthorId) === reporterId) {
+      return res.status(400).json({error: 'You cannot report your own discussion'});
+    }
+
+    const reports = db.collection('PostReports');
+    // Database-enforced deduplication also protects against simultaneous submissions.
+    await reports.createIndex({PostID: 1, ReporterId: 1}, {unique: true});
+    try {
+      await reports.insertOne({
+        PostID: postId, ReporterId: reporterId,
+        Reason: reason, CreatedAt: new Date()
+      });
+    } catch (err) {
+      if (err && err.code === 11000) {
+        return res.status(409).json({error: 'You already reported this discussion'});
+      }
+      throw err;
+    }
+
+    const reportCount = await reports.countDocuments({PostID: postId});
+    if (reportCount >= 3) {
+      await posts.updateOne({PostID: postId}, {$set: {Hidden: true, HiddenAt: new Date()}});
+    }
+    return res.status(201).json({
+      message: reportCount >= 3 ? 'Report submitted. Discussion hidden.' : 'Report submitted.',
+      reportCount,
+      hidden: reportCount >= 3
+    });
+  } catch (err) {
+    console.error('Discussion report error:', err);
+    return res.status(500).json({error: 'Unable to report discussion'});
   }
 };
