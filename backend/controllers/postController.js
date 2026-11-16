@@ -231,3 +231,33 @@ exports.deletePost = async function (req, res)
 		return res.status(500).json({error: 'Server error deleting post'});
 	}
 };
+
+// Return a shared feed of recent discussions, newest PostID first.
+// Existing posts do not have a CreatedAt field, so PostID is the ordering key.
+exports.getRecentPosts = async function (req, res) {
+  try {
+    const posts = await db.collection('Posts').aggregate([
+      { $sort: { PostID: -1 } },
+      { $limit: 100 },
+      { $lookup: {
+          from: 'Users', localField: 'AuthorId', foreignField: 'UserID', as: 'author'
+      } },
+      { $unwind: { path: '$author', preserveNullAndEmptyArrays: true } },
+      { $project: {
+          _id: 0, PostID: 1, AuthorId: 1, Title: 1, Body: 1, Tags: 1,
+          authorName: {
+            $trim: { input: { $concat: [
+              { $ifNull: ['$author.FirstName', ''] }, ' ',
+              { $ifNull: ['$author.LastName', ''] }
+            ] } }
+          }
+      } }
+    ]).toArray();
+    return res.status(200).json({posts: posts.map(post => ({
+      ...post, authorName: post.authorName || 'UCF Student'
+    }))});
+  } catch (error) {
+    console.error('Error retrieving recent posts:', error);
+    return res.status(500).json({error: 'Server error retrieving recent posts'});
+  }
+};

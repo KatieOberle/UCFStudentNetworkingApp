@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { getRecentPosts, getLoggedInUserId, type FeedPost } from "../services/api";
+
 
 interface HomePageProps {
   onDiscussionsClick: () => void;
@@ -16,6 +19,21 @@ function HomePage({
   onLogoutClick,
   logoutError,
 }: HomePageProps) {
+  const [recentPosts, setRecentPosts] = useState<FeedPost[]>([]);
+  const [loadingRecent, setLoadingRecent] = useState(true);
+  const [recentError, setRecentError] = useState("");
+  const currentUserId = getLoggedInUserId();
+
+  useEffect(() => {
+    let active = true;
+    getRecentPosts().then(data => {
+      if(active) setRecentPosts(data.posts.slice(0, 5));
+    }).catch(error => {
+      if(active) setRecentError(error instanceof Error ? error.message : "Could not load discussions");
+    }).finally(() => { if(active) setLoadingRecent(false); });
+    return () => { active = false; };
+  }, []);
+
   return (
     <div className="home-page">
       <header className="top-nav">
@@ -78,10 +96,24 @@ function HomePage({
               Create Thread
             </button>
           </div>
-
-          <div className="empty-state">
-            <p>No discussions to display yet.</p>
-          </div>
+          {loadingRecent ? (
+            <div className="empty-state"><p>Loading recent discussions...</p></div>
+          ) : recentError ? (
+            <p role="alert" className="form-error">{recentError}</p>
+          ) : recentPosts.length === 0 ? (
+            <div className="empty-state"><p>No discussions to display yet.</p></div>
+          ) : (
+            <div className="thread-replies-list">
+              {recentPosts.map(post => (
+                <article className="thread-reply-card" key={post.PostID}>
+                  <h3>{post.Title}</h3>
+                  <p className="thread-meta">Posted by {post.AuthorId === currentUserId ? "You" : post.authorName}</p>
+                  <p className="thread-body">{post.Body}</p>
+                  <button type="button" onClick={onDiscussionsClick}>View Discussions</button>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </div>

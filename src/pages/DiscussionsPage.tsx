@@ -1,7 +1,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import type { Thread } from "./ThreadDetailPage";
-import { getUserPosts } from "../services/api";
+import { getRecentPosts } from "../services/api";
 
 interface DiscussionsPageProps {
   onHomeClick: () => void;
@@ -65,7 +65,7 @@ function DiscussionsPage({
       }
 
       try {
-        const response = await getUserPosts(userId);
+        const response = await getRecentPosts();
 
         if (cancelled) return;
 
@@ -73,7 +73,8 @@ function DiscussionsPage({
           id: String(post.PostID),
           title: post.Title,
           body: post.Body,
-          authorName: "You",
+          authorName: post.AuthorId === userId ? "You" : post.authorName,
+          isOwnThread: post.AuthorId === userId,
           createdAt: "",
         })) as Thread[];
 
