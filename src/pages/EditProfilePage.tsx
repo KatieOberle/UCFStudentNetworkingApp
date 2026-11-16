@@ -66,13 +66,19 @@ function profileToForm(user: StudentProfile): ProfileData {
   const contact = user.contact ?? {};
 
   return {
-    firstName: user.firstName,
-    lastName: user.lastName,
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
     major: user.major ?? "",
-    careerInterests: toCommaSeparated(user.careerInterests ?? []),
+    careerInterests: toCommaSeparated(
+      user.careerInterests ?? []
+    ),
     contactInfo:
-      typeof contact.info === "string" ? contact.info : "",
-    companyAffiliations: toCommaSeparated(user.companies ?? []),
+      typeof contact.info === "string"
+        ? contact.info
+        : "",
+    companyAffiliations: toCommaSeparated(
+      user.companies ?? []
+    ),
   };
 }
 
@@ -90,6 +96,7 @@ function EditProfilePage({
   >({});
 
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -102,6 +109,7 @@ function EditProfilePage({
 
       if (!userId) {
         setError("Please log in to edit your profile.");
+        setLoadFailed(true);
         setLoading(false);
         return;
       }
@@ -113,8 +121,11 @@ function EditProfilePage({
 
         setProfile(profileToForm(response.user));
         setExistingContact(response.user.contact ?? {});
+        setLoadFailed(false);
+        setError("");
       } catch (err) {
         if (!cancelled) {
+          setLoadFailed(true);
           setError(
             err instanceof Error
               ? err.message
@@ -135,7 +146,10 @@ function EditProfilePage({
     };
   }, []);
 
-  function updateField(field: keyof ProfileData, value: string) {
+  function updateField(
+    field: keyof ProfileData,
+    value: string
+  ) {
     setProfile((current) => ({
       ...current,
       [field]: value,
@@ -144,7 +158,9 @@ function EditProfilePage({
     setSuccess("");
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     setError("");
@@ -157,16 +173,46 @@ function EditProfilePage({
       return;
     }
 
+    const firstName = profile.firstName.trim();
+    const lastName = profile.lastName.trim();
+
+    if (!firstName || !lastName) {
+      setError("First and last name are required.");
+      return;
+    }
+
+    if (firstName.length > 50 || lastName.length > 50) {
+      setError("Names must be 50 characters or fewer.");
+      return;
+    }
+
+    if (loadFailed) {
+      setError(
+        "Your profile could not be loaded. Please reopen this page before saving."
+      );
+      return;
+    }
+
     setSaving(true);
 
     try {
       if (onSave) {
-        await onSave(profile);
+        await onSave({
+          ...profile,
+          firstName,
+          lastName,
+        });
       } else {
         const response = await updateProfile(userId, {
+          FirstName: firstName,
+          LastName: lastName,
           Major: profile.major.trim(),
-          CareerInterests: toArray(profile.careerInterests),
-          Companies: toArray(profile.companyAffiliations),
+          CareerInterests: toArray(
+            profile.careerInterests
+          ),
+          Companies: toArray(
+            profile.companyAffiliations
+          ),
           Contact: {
             ...existingContact,
             info: profile.contactInfo.trim(),
@@ -174,7 +220,9 @@ function EditProfilePage({
         });
 
         setProfile(profileToForm(response.user));
-        setExistingContact(response.user.contact ?? {});
+        setExistingContact(
+          response.user.contact ?? {}
+        );
       }
 
       setSuccess("Profile changes saved successfully!");
@@ -205,14 +253,26 @@ function EditProfilePage({
         <section className="welcome-section">
           <h2>Edit Profile</h2>
           <p>
-            Update your student information, career interests,
-            and professional connections.
+            Update your student information, career
+            interests, and professional connections.
           </p>
         </section>
 
         <section className="discussion-section">
           {loading ? (
             <p>Loading your profile...</p>
+          ) : loadFailed ? (
+            <div>
+              <p role="alert" className="form-error">
+                {error}
+              </p>
+              <button
+                type="button"
+                onClick={onBackClick}
+              >
+                Back to Profile
+              </button>
+            </div>
           ) : (
             <form
               className="edit-profile-form"
@@ -223,7 +283,14 @@ function EditProfilePage({
                 <input
                   type="text"
                   value={profile.firstName}
-                  readOnly
+                  onChange={(event) =>
+                    updateField(
+                      "firstName",
+                      event.target.value
+                    )
+                  }
+                  maxLength={50}
+                  required
                 />
               </label>
 
@@ -232,13 +299,16 @@ function EditProfilePage({
                 <input
                   type="text"
                   value={profile.lastName}
-                  readOnly
+                  onChange={(event) =>
+                    updateField(
+                      "lastName",
+                      event.target.value
+                    )
+                  }
+                  maxLength={50}
+                  required
                 />
               </label>
-
-              <small>
-                Your account name cannot be changed here.
-              </small>
 
               <label>
                 Major
@@ -246,7 +316,10 @@ function EditProfilePage({
                   type="text"
                   value={profile.major}
                   onChange={(event) =>
-                    updateField("major", event.target.value)
+                    updateField(
+                      "major",
+                      event.target.value
+                    )
                   }
                 />
               </label>
@@ -303,7 +376,9 @@ function EditProfilePage({
               )}
 
               {success && (
-                <p role="status">{success}</p>
+                <p role="status" className="form-success">
+                  {success}
+                </p>
               )}
 
               <div className="edit-profile-actions">
@@ -319,7 +394,9 @@ function EditProfilePage({
                   type="submit"
                   disabled={saving}
                 >
-                  {saving ? "Saving..." : "Save Changes"}
+                  {saving
+                    ? "Saving..."
+                    : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -331,4 +408,3 @@ function EditProfilePage({
 }
 
 export default EditProfilePage;
-
