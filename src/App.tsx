@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   searchStudents, sendConnectionRequest, getPostComments, addComment, deleteComment,
-  deletePost, submitReport, getLoggedInUserId, logout
+  deletePost, submitReport, submitDiscussionReport, getLoggedInUserId, logout
 } from "./services/api";
 
 import SearchPage from "./pages/SearchPage";
@@ -102,6 +102,10 @@ function App() {
 
   async function removeThread(threadId: string) {
     await deletePost(Number(threadId));
+  }
+
+  async function reportDiscussion(threadId: string, reason: string) {
+    return submitDiscussionReport(Number(threadId), reason);
   }
 
   async function searchStudentProfiles(query: string): Promise<Student[]> {
@@ -262,6 +266,7 @@ function App() {
         onSubmitReply={sendReply}
         onDeleteReply={removeReply}
         onDeleteThread={removeThread}
+        onReportThread={reportDiscussion}
         onBackClick={() => {
           setThreadError("");
           setSelectedThread(null);
